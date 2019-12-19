@@ -1,0 +1,8 @@
+(
+  axes: {
+    "paddle": Emulated(neg: Key(A), pos: Key(D)),
+  },
+  actions: {
+    "launch_ball": [[Key(Space)]],
+  },
+)
