@@ -1,8 +1,7 @@
 # breakout
 
 A simple game of breakout.
-![Breakout Clone](breakout.png)
-Format: ![Alt Text](https://github.com/allora/breakout/blob/master/breakout.png)
+![alt text](/breakout.png?raw=true)
 
 ## How to run
 
