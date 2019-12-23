@@ -27,7 +27,7 @@ impl<'s> System<'s> for BlockSystem {
 
             for (e, block, block_transform) in (&entities, &mut blocks, &transforms).join() {
                 if block.hits == 0 {
-                    entities.delete(e);
+                    entities.delete(e).expect("entity deleted");
                 }
                 else {
                     let block_x = block_transform.translation().x;
