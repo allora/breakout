@@ -52,6 +52,7 @@ impl Default for PaddleConfig {
 pub struct BlockConfig {
     pub width: f32,
     pub height: f32,
+    pub hits: u8,
 }
 
 impl Default for BlockConfig {
@@ -59,10 +60,30 @@ impl Default for BlockConfig {
         BlockConfig {
             width: 10.0,
             height: 5.0,
+            hits: 0,
         }
     }
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LevelConfig {
+    pub layout: Vec<Vec<i32>>,
+}
+
+impl Default for LevelConfig {
+    fn default() -> Self {
+        LevelConfig {
+            layout: vec![
+                vec![0,0,0,0,0,0,0,0],
+                vec![0,0,0,0,0,0,0,0],
+                vec![0,0,0,0,0,0,0,0],
+                vec![0,0,0,0,0,0,0,0],
+                vec![0,0,0,0,0,0,0,0],
+                vec![0,0,0,0,0,0,0,0],
+            ]
+        }
+    }
+}
 
 // Config data
 #[derive(Debug, Default, Deserialize, Serialize)]
@@ -71,4 +92,5 @@ pub struct BreakoutConfig {
     pub ball: BallConfig,
     pub paddle: PaddleConfig,
     pub block: BlockConfig,
+    pub level: LevelConfig,
 }

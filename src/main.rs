@@ -66,6 +66,7 @@ fn main() -> amethyst::Result<()> {
         .with_resource(breakout_config.ball)
         .with_resource(breakout_config.block)
         .with_resource(breakout_config.paddle)
+        .with_resource(breakout_config.level)
         .build(game_data)?;
         
     game.run();

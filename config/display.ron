@@ -1,4 +1,4 @@
 (
   title: "breakout",
-  dimensions: Some((500, 600)),
+  dimensions: Some((480, 600)),
 )

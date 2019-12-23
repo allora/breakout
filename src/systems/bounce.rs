@@ -1,4 +1,4 @@
-use crate::game_objects::{Ball, Paddle};
+use crate::game_objects::{Ball, Paddle, Block};
 use crate::config::ArenaConfig;
 
 use amethyst::{
@@ -17,10 +17,11 @@ impl<'s> System<'s> for BounceSystem {
         WriteStorage<'s, Ball>,
         ReadStorage<'s, Transform>,
         ReadStorage<'s, Paddle>,
+        ReadStorage<'s, Block>,
         Read<'s, ArenaConfig>,
     );
 
-    fn run(&mut self, (mut balls, transforms, paddles, arena_config): Self::SystemData) {
+    fn run(&mut self, (mut balls, transforms, paddles, blocks, arena_config): Self::SystemData) {
         // Iterate over all paddles and move them according to the input the user
         // provided.
         for (ball, transform) in (&mut balls, &transforms).join() {
@@ -63,6 +64,23 @@ impl<'s> System<'s> for BounceSystem {
                     {
                         ball.velocity[1] = -ball.velocity[1];
                     }
+                }
+            }
+
+            for (block, block_transform) in (&blocks, &transforms).join() {
+                let block_x = block_transform.translation().x;
+                let block_y = block_transform.translation().y;
+
+                // TODO: change this check so that we can tell which edge boundary we are crossing
+                if point_in_rect(
+                    block_x,
+                    block_y,
+                    ball_x - (block.width * 0.5) - ball.radius,
+                    ball_y - (block.height * 0.5) - ball.radius,
+                    ball_x + (block.width * 0.5) + ball.radius,
+                    ball_y + (block.height * 0.5) + ball.radius,
+                ) {
+                    ball.velocity[1] = -ball.velocity[1];
                 }
             }
         }

@@ -23,16 +23,9 @@ impl Component for Paddle {
 pub struct Block {
     pub width: f32,
     pub height: f32,
+    pub hits: i32,
 }
 
 impl Component for Block {
-    type Storage = DenseVecStorage<Self>;
-}
-
-pub struct Level {
-    pub layout: [[u8; 8]; 6],
-}
-
-impl Component for Level {
     type Storage = DenseVecStorage<Self>;
 }

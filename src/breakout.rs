@@ -1,5 +1,5 @@
 use crate::{game_objects::*};
-use crate::config::{PaddleConfig, ArenaConfig, BallConfig};
+use crate::config::{PaddleConfig, ArenaConfig, BallConfig, LevelConfig, BlockConfig};
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
@@ -23,6 +23,7 @@ impl SimpleState for Breakout {
         // `texture` is the pixel data.
         self.sprite_sheet_handle.replace(load_sprite_sheet(world));
 
+        initialise_level(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_paddle(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_ball(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_camera(world);
@@ -73,7 +74,7 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
     )
 }
 
-/// Initialises one paddle on the left, and one paddle on the right.
+/// Initialises the paddle
 fn initialise_paddle(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let mut transform = Transform::default();
 
@@ -96,14 +97,14 @@ fn initialise_paddle(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>
         (config.width, config.paddlepos)
     };
 
-    // Correctly position the paddles.
+    // Correctly position the paddle.
     let y = arena_paddle_pos;
     transform.set_translation_xyz((paddle_width * 0.5) + (arena_width * 0.5), y, 0.0);
 
-    // Assign the sprites for the paddles
+    // Assign the sprite for the paddle
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
-        sprite_number: 0, // paddle is the first sprite in the sprite_sheet
+        sprite_number: 0, // paddle is the first sprite in the sprite sheet
     };
 
     // Create a paddle entity.
@@ -119,7 +120,7 @@ fn initialise_paddle(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>
         .build();
 }
 
-/// Initialises one paddle on the left, and one paddle on the right.
+/// Initialises the ball
 fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
     let mut transform = Transform::default();
 
@@ -134,17 +135,17 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) 
         (config.width, config.paddlepos)
     };
 
-    // Correctly position the paddles.
+    // Correctly position the ball.
     let y = arena_paddle_pos + ball_radius;
     transform.set_translation_xyz(ball_radius + (arena_width * 0.5), y, 0.0);
 
-    // Assign the sprites for the paddles
+    // Assign the sprites for the ball
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
-        sprite_number: 1, // paddle is the first sprite in the sprite_sheet
+        sprite_number: 1, // ball is the second sprite in the sprite sheet
     };
 
-    // Create a paddle entity.
+    // Create a ball entity.
     world
         .create_entity()
         .with(sprite_render.clone())
@@ -155,4 +156,65 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) 
         })
         .with(transform)
         .build();
+}
+
+/// Initialises a brick
+fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
+    // Load configs
+    let block_positions = {
+        let config = world.read_resource::<LevelConfig>();
+        config.layout.to_vec()
+    };
+
+    let (block_width, block_height) = {
+        let config = world.read_resource::<BlockConfig>();
+        (config.width, config.height)
+    };
+
+    let (_, arena_height) = {
+        let config = world.read_resource::<ArenaConfig>();
+        (config.width, config.height)
+    };
+
+    // Assign the sprites for the block
+    let sprite_render = SpriteRender {
+        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_number: 2, // Block is the third sprite
+    };
+
+    // Create a block entities.
+    for y_pos in 0..block_positions.len() {
+        for x_pos in 0..block_positions[y_pos].len() {
+            if block_positions[y_pos][x_pos] == 0 {
+                continue;
+            }
+
+            let mut transform = Transform::default();
+
+            let x = block_width * x_pos as f32;
+            let y = block_height * y_pos as f32;
+
+            let hits = block_positions[y_pos][x_pos];
+
+            transform.set_translation_xyz(
+                (block_width * 0.5) + x,
+                (arena_height - y) - (block_height * 0.5),
+                -0.1,
+            );
+
+            let block = Block {
+                width: block_width,
+                height: block_height,
+                hits: hits,
+            };
+
+            world
+                .create_entity()
+                .with(sprite_render.clone())
+                .with(block)
+                .with(transform)
+                .build();
+        };
+    };
+
 }
