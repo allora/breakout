@@ -65,32 +65,39 @@ impl Default for BlockConfig {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct LevelConfig {
-    pub layout: Vec<Vec<i32>>,
-}
-
-impl Default for LevelConfig {
-    fn default() -> Self {
-        LevelConfig {
-            layout: vec![
-                vec![0,0,0,0,0,0,0,0],
-                vec![0,0,0,0,0,0,0,0],
-                vec![0,0,0,0,0,0,0,0],
-                vec![0,0,0,0,0,0,0,0],
-                vec![0,0,0,0,0,0,0,0],
-                vec![0,0,0,0,0,0,0,0],
-            ]
-        }
-    }
-}
-
-// Config data
+// Breakout config data
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct BreakoutConfig {
     pub arena: ArenaConfig,
     pub ball: BallConfig,
     pub paddle: PaddleConfig,
     pub block: BlockConfig,
-    pub level: LevelConfig,
+}
+
+// Level data
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LevelsConfig {
+    pub layout: Vec<Vec<Vec<i32>>>,
+}
+
+impl Default for LevelsConfig {
+    fn default() -> Self {
+        LevelsConfig {
+            layout: vec![
+                vec![
+                    vec![0,0,0,0,0,0,0,0],
+                    vec![0,0,0,0,0,0,0,0],
+                    vec![0,0,0,0,0,0,0,0],
+                    vec![0,0,0,0,0,0,0,0],
+                    vec![0,0,0,0,0,0,0,0],
+                    vec![0,0,0,0,0,0,0,0],
+                ]
+            ]
+        }
+    }
+}
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+pub struct LevelsData {
+    pub levels: LevelsConfig,
 }

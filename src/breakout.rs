@@ -1,5 +1,5 @@
 use crate::{game_objects::*};
-use crate::config::{PaddleConfig, ArenaConfig, BallConfig, LevelConfig, BlockConfig};
+use crate::config::{PaddleConfig, ArenaConfig, BallConfig, LevelsConfig, BlockConfig};
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
@@ -12,6 +12,16 @@ use amethyst::{
 #[derive(Default)]
 pub struct Breakout {
     sprite_sheet_handle: Option<Handle<SpriteSheet>>,
+    level_index: usize,
+}
+
+impl Breakout {
+    pub fn new (index: usize) -> Self {
+        Breakout {
+            sprite_sheet_handle: None,
+            level_index: index,
+        }
+    }
 }
 
 impl SimpleState for Breakout {
@@ -23,7 +33,7 @@ impl SimpleState for Breakout {
         // `texture` is the pixel data.
         self.sprite_sheet_handle.replace(load_sprite_sheet(world));
 
-        initialise_level(world, self.sprite_sheet_handle.clone().unwrap());
+        initialise_level(world, self.sprite_sheet_handle.clone().unwrap(), self.level_index);
         initialise_paddle(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_ball(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_camera(world);
@@ -159,10 +169,10 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) 
 }
 
 /// Initialises a brick
-fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) {
+fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>, level_index: usize) {
     // Load configs
     let block_positions = {
-        let config = world.read_resource::<LevelConfig>();
+        let config = world.read_resource::<LevelsConfig>();
         config.layout.to_vec()
     };
 
@@ -183,9 +193,9 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>)
     };
 
     // Create a block entities.
-    for y_pos in 0..block_positions.len() {
-        for x_pos in 0..block_positions[y_pos].len() {
-            if block_positions[y_pos][x_pos] == 0 {
+    for y_pos in 0..block_positions[level_index].len() {
+        for x_pos in 0..block_positions[level_index][y_pos].len() {
+            if block_positions[level_index][y_pos][x_pos] == 0 {
                 continue;
             }
 
@@ -194,7 +204,7 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>)
             let x = block_width * x_pos as f32;
             let y = block_height * y_pos as f32;
 
-            let hits = block_positions[y_pos][x_pos];
+            let hits = block_positions[level_index][y_pos][x_pos];
 
             transform.set_translation_xyz(
                 (block_width * 0.5) + x,

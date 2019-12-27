@@ -3,6 +3,7 @@ mod breakout;
 mod bundle;
 mod config;
 mod systems;
+mod main_menu;
 
 use amethyst::{
     core::{frame_limiter::FrameRateLimitStrategy, transform::TransformBundle},
@@ -13,18 +14,19 @@ use amethyst::{
         types::DefaultBackend,
         RenderingBundle,
     },
+    ui::{RenderUi, UiBundle},
     utils::application_root_dir,
 };
 
 use crate::bundle::BreakoutBundle;
-use crate::config::BreakoutConfig;
+use crate::config::{BreakoutConfig, LevelsData};
 
 use std::time::Duration;
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
-    use crate::breakout::Breakout;
+    use crate::main_menu::MainMenu;
 
     // Config setup
     let app_root = application_root_dir()?;
@@ -37,6 +39,9 @@ fn main() -> amethyst::Result<()> {
     let breakout_config_path = config_dir.join("breakout.ron");
     let breakout_config = BreakoutConfig::load(&breakout_config_path);
 
+    let breakout_levels_path = config_dir.join("levels.ron");
+    let breakout_levels = LevelsData::load(&breakout_levels_path);
+
     let binding_path = app_root.join("config").join("bindings.ron");
     let input_bundle = InputBundle::<StringBindings>::new()
         .with_bindings_from_file(binding_path)?;
@@ -45,6 +50,7 @@ fn main() -> amethyst::Result<()> {
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
+        .with_bundle(UiBundle::<StringBindings>::new())?
         .with_bundle(BreakoutBundle)?
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
@@ -54,10 +60,12 @@ fn main() -> amethyst::Result<()> {
                         .with_clear([0.0, 0.0, 0.0, 1.0]),
                 )
                 // RenderFlat2D plugin is used to render entities with a `SpriteRender` component.
-                .with_plugin(RenderFlat2D::default()),
+                .with_plugin(RenderFlat2D::default())
+                // UI
+                .with_plugin(RenderUi::default())
         )?;
 
-    let mut game = Application::build(assets_dir, Breakout::default())?
+    let mut game = Application::build(assets_dir, MainMenu::default())?
         .with_frame_limit(
             FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
             144,
@@ -66,7 +74,7 @@ fn main() -> amethyst::Result<()> {
         .with_resource(breakout_config.ball)
         .with_resource(breakout_config.block)
         .with_resource(breakout_config.paddle)
-        .with_resource(breakout_config.level)
+        .with_resource(breakout_levels.levels)
         .build(game_data)?;
         
     game.run();

@@ -12,4 +12,4 @@ To run the game, use
 cargo run
 ```
 
-on Windows and Linux
+on Windows and Linux. Requires Vulkan support

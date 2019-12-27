@@ -1,0 +1,149 @@
+#![enable(implicit_some)]
+// Detailed field information can be found at https://docs.amethyst.rs/master/amethyst_ui/enum.UiWidget.html and related pages
+Container(
+    transform: (
+        id: "background",
+        anchor: Middle,
+        stretch: XY( x_margin: 0., y_margin: 0., keep_aspect_ratio: false),
+        width: 20.,
+        height: 20.,
+    ),
+    background: SolidColor(0.035, 0.03, 0.03, 1.0),
+    children: [
+
+        Container(
+            transform: (
+                id: "container_start",
+                y: -210,
+                width: 480.,
+                height: 150.,
+                anchor: Middle,
+            ),
+            background: SolidColor(1.0, 0.65, 0.0, 1.0),
+            children: [
+
+                Button(
+                    transform: (
+                        id: "start",
+                        width: 475.,
+                        height: 145.,
+                        tab_order: 1,
+                        anchor: Middle,
+                        mouse_reactive: true,
+                    ),
+                    button: (
+                        text: "START GAME",
+                        font: File("fonts/square.ttf", ("TTF", ())),
+                        font_size: 75.,
+                        normal_text_color: (1.0, 0.65, 0., 1.0), // ffa500
+                        normal_image: SolidColor(0., 0., 0., 1.),
+                        hover_image: SolidColor(0.1, 0.1, 0.1, 1.),
+                        press_image: SolidColor(0.15, 0.15, 0.15, 1.),
+                    )
+                ),
+            ]
+        ),
+
+        Container(
+            transform: (
+                id: "container_level",
+                y: 0,
+                width: 295.,
+                height: 100.,
+                anchor: Middle,
+            ),
+            background: SolidColor(1.0, 0.65, 0.0, 1.0),
+            children: [
+
+                Label(
+                    transform: (
+                        id: "level_index_text",
+                        y: 80,
+                        width: 295.,
+                        height: 95.,
+                        anchor: Middle,
+                    ),
+                    text: (
+                        text: "0",
+                        font: File("fonts/square.ttf", ("TTF", ())),
+                        font_size: 35.,
+                        color: (1.0, 0.65, 0., 1.0), // ffa500
+                        align: Middle,
+                    ),
+                ),
+
+                Container(
+                    transform: (
+                        id: "container_level_sub",
+                        y: 0,
+                        width: 240.,
+                        height: 95.,
+                        anchor: Middle,
+                    ),
+                    background: SolidColor(0., 0., 0., 1.0),
+                    children: [
+                        Label(
+                            transform: (
+                                id: "level",
+                                width: 240.,
+                                height: 95.,
+                                tab_order: 1,
+                                anchor: Middle,
+                                mouse_reactive: true,
+                            ),
+                            text: (
+                                text: "LEVEL",
+                                font: File("fonts/square.ttf", ("TTF", ())),
+                                font_size: 35.,
+                                color: (1.0, 0.65, 0., 1.0), // ffa500
+                                align: Middle,
+                            ),
+                        ),
+
+                        Button(
+                            transform: (
+                                id: "level_down",
+                                x: -120.,
+                                width: 50.,
+                                height: 95.,
+                                tab_order: 1,
+                                anchor: Middle,
+                                mouse_reactive: true,
+                            ),
+                            button: (
+                                text: "<<",
+                                font: File("fonts/square.ttf", ("TTF", ())),
+                                font_size: 35.,
+                                normal_text_color: (1.0, 0.65, 0., 1.0), // ffa500
+                                normal_image: SolidColor(0., 0., 0., 1.),
+                                hover_image: SolidColor(0.1, 0.1, 0.1, 1.),
+                                press_image: SolidColor(0.15, 0.15, 0.15, 1.),
+                            )
+                        ),
+
+                                                Button(
+                            transform: (
+                                id: "level_up",
+                                x: 120.,
+                                width: 50.,
+                                height: 95.,
+                                tab_order: 1,
+                                anchor: Middle,
+                                mouse_reactive: true,
+                            ),
+                            button: (
+                                text: ">>",
+                                font: File("fonts/square.ttf", ("TTF", ())),
+                                font_size: 35.,
+                                normal_text_color: (1.0, 0.65, 0., 1.0), // ffa500
+                                normal_image: SolidColor(0., 0., 0., 1.),
+                                hover_image: SolidColor(0.1, 0.1, 0.1, 1.),
+                                press_image: SolidColor(0.15, 0.15, 0.15, 1.),
+                            )
+                        ),
+                    ],
+                ),
+            ],
+        ),
+    ],
+)
