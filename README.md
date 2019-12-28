@@ -2,7 +2,7 @@
 
 A simple game of breakout.
 
-![alt text](/breakout.png?raw=true)
+![alt text](/breakout.gif?raw=true)
 
 ## How to run
 
