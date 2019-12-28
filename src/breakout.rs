@@ -1,12 +1,16 @@
 use crate::{game_objects::*};
 use crate::config::{PaddleConfig, ArenaConfig, BallConfig, LevelsConfig, BlockConfig};
+use crate::pause::PauseMenu;
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
     core::{transform::Transform},
-    ecs::prelude::World,
+    ecs::{Component, NullStorage},
+    ecs::prelude::{Join},
+    ecs::world::EntitiesRes,
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    input::{VirtualKeyCode, is_key_down, is_close_requested},
 };
 
 #[derive(Default)]
@@ -24,19 +28,84 @@ impl Breakout {
     }
 }
 
+#[derive(Default)]
+pub struct BreakoutRemovalTag;
+
+impl Component for BreakoutRemovalTag {
+    type Storage = NullStorage<Self>;
+}
+
+#[derive(Default)]
+pub struct PauseState {
+    pub paused: bool,
+}
+
 impl SimpleState for Breakout {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let StateData { world, .. } = data;
+
+        world.register::<BreakoutRemovalTag>();
 
         // Load the spritesheet necessary to render the graphics.
         // `spritesheet` is the layout of the sprites on the image;
         // `texture` is the pixel data.
         self.sprite_sheet_handle.replace(load_sprite_sheet(world));
 
+        // Set initial pause bool
+        let pause_state = PauseState {
+            paused: true
+        };
+
+        let _ = world.entry::<PauseState>().or_insert_with(|| pause_state);
+
         initialise_level(world, self.sprite_sheet_handle.clone().unwrap(), self.level_index);
         initialise_paddle(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_ball(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_camera(world);
+    }
+
+    fn handle_event(&mut self, _: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
+        match event {
+            StateEvent::Window(event) => {
+                if is_close_requested(&event) {
+                    Trans::Quit
+                } else if is_key_down(&event, VirtualKeyCode::Escape) {
+                    Trans::Push(Box::new(PauseMenu::default()))
+                } else {
+                    Trans::None
+                }
+            }
+
+            _ => Trans::None
+        }
+    }
+
+    fn on_pause(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let pause_state = data.world.try_fetch_mut::<PauseState>();
+        if let Some(mut pause_resource) = pause_state {
+            pause_resource.paused = true;
+        };
+    }
+
+    fn on_resume(&mut self, data: StateData<'_, GameData<'_, '_>>) {
+        let pause_state = data.world.try_fetch_mut::<PauseState>();
+        if let Some(mut pause_resource) = pause_state {
+            pause_resource.paused = false;
+        };
+    }
+
+    fn on_stop(&mut self, data: StateData<GameData>) {
+        let entities = data.world.read_resource::<EntitiesRes>();
+        let removal_tags = data.world.read_storage::<BreakoutRemovalTag>();
+
+        let deletions_successful = (&entities, &removal_tags)
+            .join()
+            .map(|(entity, _)| entities.delete(entity))
+            .all(|x| x.is_ok());
+
+        if !deletions_successful {
+            println!("Failed to delete level");
+        }
     }
 }
 
@@ -55,6 +124,7 @@ fn initialise_camera(world: &mut World) {
         .create_entity()
         .with(Camera::standard_2d(arena_width, arena_height))
         .with(transform)
+        .with(BreakoutRemovalTag)
         .build();
 }
 
@@ -127,6 +197,7 @@ fn initialise_paddle(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>
             height: paddle_height,
         })
         .with(transform)
+        .with(BreakoutRemovalTag)
         .build();
 }
 
@@ -165,6 +236,7 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) 
             velocity: [0.0, 0.0],
         })
         .with(transform)
+        .with(BreakoutRemovalTag)
         .build();
 }
 
@@ -223,6 +295,7 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>,
                 .with(sprite_render.clone())
                 .with(block)
                 .with(transform)
+                .with(BreakoutRemovalTag)
                 .build();
         };
     };

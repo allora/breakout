@@ -2,19 +2,15 @@ extern crate amethyst;
 
 use crate::breakout::Breakout;
 use crate::config::LevelsConfig;
-use std::iter;
+use crate::util::*;
+
 use std::cmp;
 
 use amethyst::{
     prelude::*,
     input::{VirtualKeyCode, is_key_down, is_close_requested},
     ui::{UiCreator, UiEvent, UiEventType, UiFinder, UiText},
-
-    core::transform::ParentHierarchy,
-    ecs::{
-        error::WrongGeneration,
-        prelude::{Entity, World, WorldExt},
-    },
+    ecs::prelude::{Entity, WorldExt},
 };
 
 const BUTTON_START: &str = "start";
@@ -97,6 +93,7 @@ impl SimpleState for MainMenu {
         if self.button_start.is_none()
             || self.button_level_up.is_none()
             || self.button_level_down.is_none()
+            || self.text_level_index.is_none()
         {
             world.exec(|ui_finder: UiFinder<'_>| {
                 self.button_start = ui_finder.find(BUTTON_START);
@@ -123,18 +120,3 @@ impl SimpleState for MainMenu {
     }
 }
 
-/// delete the specified root entity and all of its descendents as specified
-/// by the Parent component and maintained by the ParentHierarchy resource
-// from https://github.com/amethyst/evoli src/utils/hierarchy_util.rs
-pub fn delete_hierarchy(root: Entity, world: &mut World) -> Result<(), WrongGeneration> {
-    let entities = {
-        iter::once(root)
-            .chain(
-                world
-                    .read_resource::<ParentHierarchy>()
-                    .all_children_iter(root),
-            )
-            .collect::<Vec<Entity>>()
-    };
-    world.delete_entities(&entities)
-}

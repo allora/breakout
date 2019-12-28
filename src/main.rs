@@ -4,6 +4,8 @@ mod bundle;
 mod config;
 mod systems;
 mod main_menu;
+mod pause;
+mod util;
 
 use amethyst::{
     core::{frame_limiter::FrameRateLimitStrategy, transform::TransformBundle},

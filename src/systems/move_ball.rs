@@ -1,4 +1,5 @@
 use crate::game_objects::{Ball,Paddle};
+use crate::breakout::PauseState;
 
 use amethyst::{
     core::{Time, Transform, SystemDesc},
@@ -19,9 +20,14 @@ impl<'s> System<'s> for MoveBallSystem {
         ReadStorage<'s, Paddle>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
+        Read<'s, PauseState>,
     );
 
-    fn run(&mut self, (mut balls, mut transforms, paddles, input, time): Self::SystemData) {
+    fn run(&mut self, (mut balls, mut transforms, paddles, input, time, pause_state): Self::SystemData) {
+        if pause_state.paused {
+            return;
+        }
+
         let mut paddle_x = 0.0;
         let mut paddle_y = 0.0;
         for (_, paddle_transform) in (&paddles, &transforms).join() {

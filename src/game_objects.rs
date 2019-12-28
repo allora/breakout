@@ -10,6 +10,7 @@ impl Component for Ball {
     type Storage = DenseVecStorage<Self>;
 }
 
+#[derive(Default)]
 pub struct Paddle {
     pub velocity: f32,
     pub width: f32,

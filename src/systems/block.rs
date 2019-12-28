@@ -1,9 +1,10 @@
 use crate::game_objects::{Ball, Block};
+use crate::breakout::PauseState;
 
 use amethyst::{
     core::{Transform, SystemDesc},
     derive::SystemDesc,
-    ecs::prelude::{Join, Entities, ReadStorage, System, SystemData, WriteStorage, World},
+    ecs::prelude::{Join, Entities, ReadStorage, System, Read, SystemData, WriteStorage, World},
 };
 
 /// This system is responsible for moving all the paddles according to the user
@@ -17,9 +18,14 @@ impl<'s> System<'s> for BlockSystem {
         WriteStorage<'s, Block>,
         ReadStorage<'s, Ball>,
         ReadStorage<'s, Transform>,
+        Read<'s, PauseState>,
     );
 
-    fn run(&mut self, (entities, mut blocks, balls, transforms): Self::SystemData) {
+    fn run(&mut self, (entities, mut blocks, balls, transforms, pause_state): Self::SystemData) {
+        if pause_state.paused {
+            return;
+        }
+
         // Iterate over all balls and blocks and see if a block loses a hit
         for (ball, transform) in (&balls, &transforms).join() {
             let ball_x = transform.translation().x;

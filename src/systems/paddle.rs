@@ -1,5 +1,6 @@
 use crate::game_objects::Paddle;
 use crate::config::ArenaConfig;
+use crate::breakout::PauseState;
 
 use amethyst::{
     core::{Time, Transform, SystemDesc},
@@ -20,9 +21,14 @@ impl<'s> System<'s> for PaddleSystem {
         Read<'s, Time>,
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, ArenaConfig>,
+        Read<'s, PauseState>,
     );
 
-    fn run(&mut self, (paddles, mut transforms, time, input, arena_config): Self::SystemData) {
+    fn run(&mut self, (paddles, mut transforms, time, input, arena_config, pause_state): Self::SystemData) {
+        if pause_state.paused {
+            return;
+        }
+
         // Iterate over all paddles and move them according to the input the user
         // provided.
         for (paddle, transform) in (&paddles, &mut transforms).join() {

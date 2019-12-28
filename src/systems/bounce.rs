@@ -1,5 +1,6 @@
 use crate::game_objects::{Ball, Paddle, Block};
 use crate::config::ArenaConfig;
+use crate::breakout::PauseState;
 
 use amethyst::{
     core::{Transform, SystemDesc},
@@ -19,9 +20,14 @@ impl<'s> System<'s> for BounceSystem {
         ReadStorage<'s, Paddle>,
         ReadStorage<'s, Block>,
         Read<'s, ArenaConfig>,
+        Read<'s, PauseState>,
     );
 
-    fn run(&mut self, (mut balls, transforms, paddles, blocks, arena_config): Self::SystemData) {
+    fn run(&mut self, (mut balls, transforms, paddles, blocks, arena_config, pause_state): Self::SystemData) {
+        if pause_state.paused {
+            return;
+        }
+
         // Iterate over all paddles and move them according to the input the user
         // provided.
         for (ball, transform) in (&mut balls, &transforms).join() {
