@@ -248,9 +248,13 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>,
         config.layout.to_vec()
     };
 
-    let (block_width, block_height) = {
+    let (block_width, block_height, block_damage_states) = {
         let config = world.read_resource::<BlockConfig>();
-        (config.width, config.height)
+        (
+            config.width,
+            config.height,
+            config.damage_states.to_vec(),
+        )
     };
 
     let (_, arena_height) = {
@@ -259,7 +263,7 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>,
     };
 
     // Assign the sprites for the block
-    let sprite_render = SpriteRender {
+    let mut sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
         sprite_number: 2, // Block is the third sprite
     };
@@ -287,8 +291,12 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>,
             let block = Block {
                 width: block_width,
                 height: block_height,
-                hits: hits,
+                max_hits: hits,
+                cur_hits: 0,
+                cur_damage_state: (hits - 1) as usize,
             };
+
+            sprite_render.sprite_number = block_damage_states[block.cur_damage_state].0;
 
             world
                 .create_entity()

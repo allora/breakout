@@ -53,6 +53,7 @@ pub struct BlockConfig {
     pub width: f32,
     pub height: f32,
     pub hits: u8,
+    pub damage_states: Vec<(usize, i32)>,
 }
 
 impl Default for BlockConfig {
@@ -61,6 +62,7 @@ impl Default for BlockConfig {
             width: 10.0,
             height: 5.0,
             hits: 0,
+            damage_states: vec![(0,0)],
         }
     }
 }

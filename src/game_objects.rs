@@ -24,7 +24,9 @@ impl Component for Paddle {
 pub struct Block {
     pub width: f32,
     pub height: f32,
-    pub hits: i32,
+    pub max_hits: i32,
+    pub cur_hits: i32,
+    pub cur_damage_state: usize,
 }
 
 impl Component for Block {

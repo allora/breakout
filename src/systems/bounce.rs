@@ -73,6 +73,7 @@ impl<'s> System<'s> for BounceSystem {
                 }
             }
 
+            // bounce off block
             for (block, block_transform) in (&blocks, &transforms).join() {
                 let block_x = block_transform.translation().x;
                 let block_y = block_transform.translation().y;

@@ -32,7 +32,7 @@ impl<'s> System<'s> for BlockSystem {
             let ball_y = transform.translation().y;
 
             for (e, block, block_transform) in (&entities, &mut blocks, &transforms).join() {
-                if block.hits == 0 {
+                if block.cur_hits >= block.max_hits {
                     entities.delete(e).expect("entity deleted");
                 }
                 else {
@@ -52,7 +52,7 @@ impl<'s> System<'s> for BlockSystem {
                         ball_x + (block.width * 0.5) + ball.radius,
                         ball_y + (block.height * 0.5) + ball.radius,
                     ) {
-                        block.hits = block.hits - 1;
+                        block.cur_hits += 1;
                     }
                 }
             }
