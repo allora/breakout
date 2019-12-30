@@ -1,6 +1,7 @@
 use crate::game_objects::{Ball, Paddle, Block};
 use crate::config::ArenaConfig;
 use crate::breakout::PauseState;
+use crate::util::*;
 
 use amethyst::{
     core::{Transform, SystemDesc},
@@ -8,8 +9,7 @@ use amethyst::{
     ecs::prelude::{Join, Read, ReadStorage, System, SystemData, WriteStorage, World},
 };
 
-/// This system is responsible for moving all the paddles according to the user
-/// provided input.
+/// This system is responsible for properly bouncing the ball off various surfaces
 #[derive(SystemDesc)]
 pub struct BounceSystem;
 
@@ -28,8 +28,7 @@ impl<'s> System<'s> for BounceSystem {
             return;
         }
 
-        // Iterate over all paddles and move them according to the input the user
-        // provided.
+        // Iterate over all balls and test them for collisions
         for (ball, transform) in (&mut balls, &transforms).join() {
             let ball_x = transform.translation().x;
             let ball_y = transform.translation().y;
@@ -73,12 +72,14 @@ impl<'s> System<'s> for BounceSystem {
                 }
             }
 
-            // bounce off block
+            // bounce off a block
             for (block, block_transform) in (&blocks, &transforms).join() {
                 let block_x = block_transform.translation().x;
                 let block_y = block_transform.translation().y;
 
-                // TODO: change this check so that we can tell which edge boundary we are crossing
+                // TODO: This doesnt cover the case where the ball has moved too far in a single
+                // frame thus completely missing the block. This also is not super accurate due
+                // to block adjecencies, sometimes the wrong block is bounced off of
                 if point_in_rect(
                     block_x,
                     block_y,
@@ -87,15 +88,92 @@ impl<'s> System<'s> for BounceSystem {
                     ball_x + (block.width * 0.5) + ball.radius,
                     ball_y + (block.height * 0.5) + ball.radius,
                 ) {
-                    ball.velocity[1] = -ball.velocity[1];
+                    // Test vertical parallel
+                    if is_vector_parallel(
+                        // top of block
+                        block_x,
+                        block_y + block.height * 0.5,
+                        // bottom of block
+                        block_x,
+                        block_y - block.height * 0.5,
+                        // last ball pos
+                        ball_x - ball.velocity[0],
+                        ball_y - ball.velocity[1],
+                        //cur ball pos
+                        ball_x,
+                        ball_y,
+                    ) {
+                        // bounce vertically
+                        ball.velocity[1] = -ball.velocity[1];
+                    }
+
+                    // Test horizontal parallel
+                    else if is_vector_parallel(
+                        // left of block
+                        block_x - block.width * 0.5,
+                        block_y,
+                        // right of block
+                        block_x + block.width * 0.5,
+                        block_y,
+                        // last ball pos
+                        ball_x - ball.velocity[0],
+                        ball_y - ball.velocity[1],
+                        //cur ball pos
+                        ball_x,
+                        ball_y,
+                    ) {
+                        // bounce horizontally
+                        ball.velocity[0] = -ball.velocity[0];
+                    }
+
+                    // Test top line intersection
+                    else if is_line_intersected(
+                        // left of block
+                        block_x - block.width * 0.5 - ball.radius,
+                        block_y + block.height * 0.5 + ball.radius,
+                        // right of block
+                        block_x + block.width * 0.5 + ball.radius,
+                        block_y + block.height * 0.5 + ball.radius,
+                        // last ball pos
+                        ball_x - ball.velocity[0],
+                        ball_y - ball.velocity[1],
+                        //cur ball pos
+                        ball_x,
+                        ball_y,
+                    ) {
+                        // bounce vertically
+                        ball.velocity[1] = -ball.velocity[1];
+                    }
+
+                    // Test bottom line intersection
+                    else if is_line_intersected(
+                        // left of block
+                        block_x - block.width * 0.5 - ball.radius,
+                        block_y - block.height * 0.5 - ball.radius,
+                        // right of block
+                        block_x + block.width * 0.5 + ball.radius,
+                        block_y - block.height * 0.5 - ball.radius,
+                        // last ball pos
+                        ball_x - ball.velocity[0],
+                        ball_y - ball.velocity[1],
+                        //cur ball pos
+                        ball_x,
+                        ball_y,
+                    ) {
+                        // bounce vertically
+                        ball.velocity[1] = -ball.velocity[1];
+                    } else
+                    {
+                        // We dont have to test the rest. If we didnt cross top or bottom bounds,
+                        // we crossed the sides and thus bounce horizontally
+                        ball.velocity[0] = -ball.velocity[0];
+                    }
+
+                    // The ball bounced off a block already, dont need to test other blocks
+                    break;
                 }
             }
         }
     }
 }
 
-// A point is in a box when its coordinates are smaller or equal than the top
-// right and larger or equal than the bottom left.
-fn point_in_rect(x: f32, y: f32, left: f32, bottom: f32, right: f32, top: f32) -> bool {
-    x >= left && x <= right && y >= bottom && y <= top
-}

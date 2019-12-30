@@ -9,8 +9,7 @@ use amethyst::{
     ecs::prelude::{Join, System, Read, SystemData, WriteStorage, World},
 };
 
-/// This system is responsible for moving all the paddles according to the user
-/// provided input.
+/// This system is responsible for managing block damage state visuals
 #[derive(SystemDesc)]
 pub struct BlockStateSystem;
 
@@ -30,6 +29,7 @@ impl<'s> System<'s> for BlockStateSystem {
         for (block, renderer) in (&mut blocks, &mut renderers).join() {
             let (_, damage_threshold) = block_config.damage_states[block.cur_damage_state];
             
+            // change block sprite index based on damage thresholds
             if (block.max_hits - block.cur_hits) < damage_threshold 
                 && block.cur_hits != block.max_hits {
                 block.cur_damage_state = (block.cur_damage_state - 1).max(0);

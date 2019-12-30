@@ -8,8 +8,7 @@ use amethyst::{
     input::{InputHandler, StringBindings},
 };
 
-/// This system is responsible for moving all the paddles according to the user
-/// provided input.
+/// This system is responsible for moving all the balls
 #[derive(SystemDesc)]
 pub struct MoveBallSystem;
 
@@ -35,7 +34,7 @@ impl<'s> System<'s> for MoveBallSystem {
             paddle_y = paddle_transform.translation().y;
         }
 
-        // Iterate over all balls and bounce them.
+        // Iterate over all balls and move them according to their velocity.
         for (ball, transform) in (&mut balls, &mut transforms).join() {
             let opt_launch = input.action_is_down("launch_ball").unwrap_or(false);
 

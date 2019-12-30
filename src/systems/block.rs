@@ -1,5 +1,6 @@
 use crate::game_objects::{Ball, Block};
 use crate::breakout::PauseState;
+use crate::util::point_in_rect;
 
 use amethyst::{
     core::{Transform, SystemDesc},
@@ -7,8 +8,7 @@ use amethyst::{
     ecs::prelude::{Join, Entities, ReadStorage, System, Read, SystemData, WriteStorage, World},
 };
 
-/// This system is responsible for moving all the paddles according to the user
-/// provided input.
+/// This system is responsible for tracking block health
 #[derive(SystemDesc)]
 pub struct BlockSystem;
 
@@ -39,6 +39,10 @@ impl<'s> System<'s> for BlockSystem {
                     let block_x = block_transform.translation().x;
                     let block_y = block_transform.translation().y;
 
+                    // TODO: This is not super accurate due to block adjecencies, sometimes
+                    // the additional blocks' health are decrimented. Might also need to figure
+                    // out which block to hit based on velocity direction
+
                     // To determine whether the ball has collided with a block, we create a larger
                     // rectangle around the current one, by subtracting the ball radius from the
                     // lowest coordinates, and adding the ball radius to the highest ones. The ball
@@ -58,10 +62,4 @@ impl<'s> System<'s> for BlockSystem {
             }
         }
     }
-}
-
-// A point is in a box when its coordinates are smaller or equal than the top
-// right and larger or equal than the bottom left.
-fn point_in_rect(x: f32, y: f32, left: f32, bottom: f32, right: f32, top: f32) -> bool {
-    x >= left && x <= right && y >= bottom && y <= top
 }
