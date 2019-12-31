@@ -1,11 +1,11 @@
-use crate::game_objects::{Ball, Block};
 use crate::breakout::PauseState;
+use crate::game_objects::{Ball, Block};
 use crate::util::point_in_rect;
 
 use amethyst::{
-    core::{Transform, SystemDesc},
+    core::{SystemDesc, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Entities, ReadStorage, System, Read, SystemData, WriteStorage, World},
+    ecs::prelude::{Entities, Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
 };
 
 /// This system is responsible for tracking block health
@@ -34,8 +34,7 @@ impl<'s> System<'s> for BlockSystem {
             for (e, block, block_transform) in (&entities, &mut blocks, &transforms).join() {
                 if block.cur_hits >= block.max_hits {
                     entities.delete(e).expect("entity deleted");
-                }
-                else {
+                } else {
                     let block_x = block_transform.translation().x;
                     let block_y = block_transform.translation().y;
 

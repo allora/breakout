@@ -1,12 +1,12 @@
-use crate::game_objects::{Block};
 use crate::breakout::PauseState;
 use crate::config::BlockConfig;
+use crate::game_objects::Block;
 
 use amethyst::{
-    core::{SystemDesc},
+    core::SystemDesc,
     derive::SystemDesc,
+    ecs::prelude::{Join, Read, System, SystemData, World, WriteStorage},
     renderer::SpriteRender,
-    ecs::prelude::{Join, System, Read, SystemData, WriteStorage, World},
 };
 
 /// This system is responsible for managing block damage state visuals
@@ -28,15 +28,16 @@ impl<'s> System<'s> for BlockStateSystem {
 
         for (block, renderer) in (&mut blocks, &mut renderers).join() {
             let (_, damage_threshold) = block_config.damage_states[block.cur_damage_state];
-            
+
             // change block sprite index based on damage thresholds
-            if (block.max_hits - block.cur_hits) < damage_threshold 
-                && block.cur_hits != block.max_hits {
+            if (block.max_hits - block.cur_hits) < damage_threshold
+                && block.cur_hits != block.max_hits
+            {
                 block.cur_damage_state = (block.cur_damage_state - 1).max(0);
 
                 let (sprite_index, _) = block_config.damage_states[block.cur_damage_state];
                 renderer.sprite_number = sprite_index;
-            } 
+            }
         }
     }
 }

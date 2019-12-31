@@ -1,11 +1,11 @@
-use crate::game_objects::Paddle;
-use crate::config::ArenaConfig;
 use crate::breakout::PauseState;
+use crate::config::ArenaConfig;
+use crate::game_objects::Paddle;
 
 use amethyst::{
-    core::{Time, Transform, SystemDesc},
+    core::{SystemDesc, Time, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, WriteStorage, World},
+    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
     input::{InputHandler, StringBindings},
 };
 
@@ -24,7 +24,10 @@ impl<'s> System<'s> for PaddleSystem {
         Read<'s, PauseState>,
     );
 
-    fn run(&mut self, (paddles, mut transforms, time, input, arena_config, pause_state): Self::SystemData) {
+    fn run(
+        &mut self,
+        (paddles, mut transforms, time, input, arena_config, pause_state): Self::SystemData,
+    ) {
         if pause_state.paused {
             return;
         }

@@ -1,5 +1,4 @@
-
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ArenaConfig {
@@ -25,9 +24,7 @@ pub struct BallConfig {
 
 impl Default for BallConfig {
     fn default() -> Self {
-        BallConfig {
-            radius: 2.5,
-        }
+        BallConfig { radius: 2.5 }
     }
 }
 
@@ -62,7 +59,7 @@ impl Default for BlockConfig {
             width: 10.0,
             height: 5.0,
             hits: 0,
-            damage_states: vec![(0,0)],
+            damage_states: vec![(0, 0)],
         }
     }
 }
@@ -85,16 +82,14 @@ pub struct LevelsConfig {
 impl Default for LevelsConfig {
     fn default() -> Self {
         LevelsConfig {
-            layout: vec![
-                vec![
-                    vec![0,0,0,0,0,0,0,0],
-                    vec![0,0,0,0,0,0,0,0],
-                    vec![0,0,0,0,0,0,0,0],
-                    vec![0,0,0,0,0,0,0,0],
-                    vec![0,0,0,0,0,0,0,0],
-                    vec![0,0,0,0,0,0,0,0],
-                ]
-            ]
+            layout: vec![vec![
+                vec![0, 0, 0, 0, 0, 0, 0, 0],
+                vec![0, 0, 0, 0, 0, 0, 0, 0],
+                vec![0, 0, 0, 0, 0, 0, 0, 0],
+                vec![0, 0, 0, 0, 0, 0, 0, 0],
+                vec![0, 0, 0, 0, 0, 0, 0, 0],
+                vec![0, 0, 0, 0, 0, 0, 0, 0],
+            ]],
         }
     }
 }

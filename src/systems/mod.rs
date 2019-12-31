@@ -1,13 +1,10 @@
-mod paddle;
-mod move_ball;
-mod bounce;
 mod block;
 mod block_state;
+mod bounce;
+mod move_ball;
+mod paddle;
 
 pub use self::{
-    paddle::PaddleSystem,
-    move_ball::MoveBallSystem,
-    bounce::BounceSystem,
-    block::BlockSystem,
-    block_state::BlockStateSystem,
+    block::BlockSystem, block_state::BlockStateSystem, bounce::BounceSystem,
+    move_ball::MoveBallSystem, paddle::PaddleSystem,
 };

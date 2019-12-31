@@ -7,10 +7,10 @@ use crate::util::*;
 use std::cmp;
 
 use amethyst::{
-    prelude::*,
-    input::{VirtualKeyCode, is_key_down, is_close_requested},
-    ui::{UiCreator, UiEvent, UiEventType, UiFinder, UiText},
     ecs::prelude::{Entity, WorldExt},
+    input::{is_close_requested, is_key_down, VirtualKeyCode},
+    prelude::*,
+    ui::{UiCreator, UiEvent, UiEventType, UiFinder, UiText},
 };
 
 const BUTTON_START: &str = "start";
@@ -34,10 +34,15 @@ impl SimpleState for MainMenu {
 
         self.level_index = 0;
 
-        self.ui_root = Some(world.exec(|mut creator: UiCreator<'_>| creator.create("ui/main_menu.ron", ())));
+        self.ui_root =
+            Some(world.exec(|mut creator: UiCreator<'_>| creator.create("ui/main_menu.ron", ())));
     }
 
-    fn handle_event(&mut self, state_data: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        state_data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         let StateData { world, .. } = state_data;
 
         match event {
@@ -73,7 +78,10 @@ impl SimpleState for MainMenu {
                 if old_index != self.level_index {
                     let mut ui_text = world.write_storage::<UiText>();
                     {
-                        if let Some(text) = self.text_level_index.and_then(|entity| ui_text.get_mut(entity)) {
+                        if let Some(text) = self
+                            .text_level_index
+                            .and_then(|entity| ui_text.get_mut(entity))
+                        {
                             text.text = self.level_index.to_string();
                         }
                     }
@@ -82,7 +90,7 @@ impl SimpleState for MainMenu {
                 Trans::None
             }
 
-            _ => Trans::None
+            _ => Trans::None,
         }
     }
 
@@ -119,4 +127,3 @@ impl SimpleState for MainMenu {
         self.level_index = 0;
     }
 }
-

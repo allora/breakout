@@ -1,4 +1,4 @@
-use::amethyst::ecs::{Component, DenseVecStorage};
+use ::amethyst::ecs::{Component, DenseVecStorage};
 
 pub struct Ball {
     pub velocity: [f32; 2],

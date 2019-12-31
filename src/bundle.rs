@@ -1,4 +1,4 @@
-use crate::systems::{PaddleSystem, MoveBallSystem, BounceSystem, BlockSystem, BlockStateSystem};
+use crate::systems::{BlockStateSystem, BlockSystem, BounceSystem, MoveBallSystem, PaddleSystem};
 
 use amethyst::{
     core::bundle::SystemBundle,
@@ -16,25 +16,17 @@ impl<'a, 'b> SystemBundle<'a, 'b> for BreakoutBundle {
     ) -> Result<(), Error> {
         builder.add(PaddleSystem, "paddle_system", &["input_system"]);
         builder.add(MoveBallSystem, "ball_system", &["input_system"]);
-        
-        builder.add(
-            BlockSystem,
-            "block_system",
-            &["ball_system"],
-        );
 
-        builder.add(
-            BlockStateSystem,
-            "block_state_system",
-            &["block_system"],
-        );
+        builder.add(BlockSystem, "block_system", &["ball_system"]);
+
+        builder.add(BlockStateSystem, "block_state_system", &["block_system"]);
 
         builder.add(
             BounceSystem,
             "collision_system",
             &["paddle_system", "ball_system"],
         );
-        
+
         Ok(())
     }
 }

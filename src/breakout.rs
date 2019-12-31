@@ -1,16 +1,16 @@
-use crate::{game_objects::*};
-use crate::config::{PaddleConfig, ArenaConfig, BallConfig, LevelsConfig, BlockConfig};
+use crate::config::{ArenaConfig, BallConfig, BlockConfig, LevelsConfig, PaddleConfig};
+use crate::game_objects::*;
 use crate::pause::PauseMenu;
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
-    core::{transform::Transform},
-    ecs::{Component, NullStorage},
-    ecs::prelude::{Join},
+    core::transform::Transform,
+    ecs::prelude::Join,
     ecs::world::EntitiesRes,
+    ecs::{Component, NullStorage},
+    input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
-    input::{VirtualKeyCode, is_key_down, is_close_requested},
 };
 
 #[derive(Default)]
@@ -20,7 +20,7 @@ pub struct Breakout {
 }
 
 impl Breakout {
-    pub fn new (index: usize) -> Self {
+    pub fn new(index: usize) -> Self {
         Breakout {
             sprite_sheet_handle: None,
             level_index: index,
@@ -52,19 +52,25 @@ impl SimpleState for Breakout {
         self.sprite_sheet_handle.replace(load_sprite_sheet(world));
 
         // Set initial pause bool
-        let pause_state = PauseState {
-            paused: true
-        };
+        let pause_state = PauseState { paused: true };
 
         let _ = world.entry::<PauseState>().or_insert_with(|| pause_state);
 
-        initialise_level(world, self.sprite_sheet_handle.clone().unwrap(), self.level_index);
+        initialise_level(
+            world,
+            self.sprite_sheet_handle.clone().unwrap(),
+            self.level_index,
+        );
         initialise_paddle(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_ball(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_camera(world);
     }
 
-    fn handle_event(&mut self, _: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        _: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         match event {
             StateEvent::Window(event) => {
                 if is_close_requested(&event) {
@@ -76,7 +82,7 @@ impl SimpleState for Breakout {
                 }
             }
 
-            _ => Trans::None
+            _ => Trans::None,
         }
     }
 
@@ -110,7 +116,7 @@ impl SimpleState for Breakout {
 }
 
 fn initialise_camera(world: &mut World) {
-    // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left. 
+    // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left.
     let mut transform = Transform::default();
 
     let (arena_height, arena_width) = {
@@ -133,7 +139,7 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
     // The texture is the pixel data
     // `sprite_sheet` is the layout of the sprites on the image
     // `texture_handle` is a cloneable reference to the texture
-    
+
     let loader = world.read_resource::<Loader>();
     let texture_handle = {
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
@@ -148,7 +154,7 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
     let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
     loader.load(
         "textures/breakout_spritesheet.ron", // Here we load the associated ron file
-        SpriteSheetFormat(texture_handle), // We pass it the texture we want it to use
+        SpriteSheetFormat(texture_handle),   // We pass it the texture we want it to use
         (),
         &sprite_sheet_store,
     )
@@ -159,17 +165,9 @@ fn initialise_paddle(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>
     let mut transform = Transform::default();
 
     // Load configs
-    let (
-        paddle_height,
-        paddle_width,
-        paddle_velocity,
-    ) = {
+    let (paddle_height, paddle_width, paddle_velocity) = {
         let config = world.read_resource::<PaddleConfig>();
-        (
-            config.height,
-            config.width,
-            config.velocity,
-        )
+        (config.height, config.width, config.velocity)
     };
 
     let (arena_width, arena_paddle_pos) = {
@@ -241,7 +239,11 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) 
 }
 
 /// Initialises a brick
-fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>, level_index: usize) {
+fn initialise_level(
+    world: &mut World,
+    sprite_sheet_handle: Handle<SpriteSheet>,
+    level_index: usize,
+) {
     // Load configs
     let block_positions = {
         let config = world.read_resource::<LevelsConfig>();
@@ -250,11 +252,7 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>,
 
     let (block_width, block_height, block_damage_states) = {
         let config = world.read_resource::<BlockConfig>();
-        (
-            config.width,
-            config.height,
-            config.damage_states.to_vec(),
-        )
+        (config.width, config.height, config.damage_states.to_vec())
     };
 
     let (_, arena_height) = {
@@ -305,7 +303,6 @@ fn initialise_level(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>,
                 .with(transform)
                 .with(BreakoutRemovalTag)
                 .build();
-        };
-    };
-
+        }
+    }
 }

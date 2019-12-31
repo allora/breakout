@@ -1,10 +1,10 @@
-use crate::game_objects::{Ball,Paddle};
 use crate::breakout::PauseState;
+use crate::game_objects::{Ball, Paddle};
 
 use amethyst::{
-    core::{Time, Transform, SystemDesc},
+    core::{SystemDesc, Time, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, WriteStorage, World},
+    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
     input::{InputHandler, StringBindings},
 };
 
@@ -22,7 +22,10 @@ impl<'s> System<'s> for MoveBallSystem {
         Read<'s, PauseState>,
     );
 
-    fn run(&mut self, (mut balls, mut transforms, paddles, input, time, pause_state): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut balls, mut transforms, paddles, input, time, pause_state): Self::SystemData,
+    ) {
         if pause_state.paused {
             return;
         }
@@ -43,8 +46,7 @@ impl<'s> System<'s> for MoveBallSystem {
                     println!("Launch Ball!");
                     ball.velocity = [300.0, 300.0];
                     ball.has_launched = true;
-                }
-                else {
+                } else {
                     transform.set_translation_x(paddle_x);
                     transform.set_translation_y(paddle_y + ball.radius);
                 }
@@ -61,7 +63,6 @@ impl<'s> System<'s> for MoveBallSystem {
                     println!("Died!");
                 }
             }
-
         }
     }
 }

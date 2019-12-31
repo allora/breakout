@@ -1,10 +1,10 @@
-mod game_objects;
 mod breakout;
 mod bundle;
 mod config;
-mod systems;
+mod game_objects;
 mod main_menu;
 mod pause;
+mod systems;
 mod util;
 
 use amethyst::{
@@ -25,6 +25,7 @@ use crate::config::{BreakoutConfig, LevelsData};
 
 use std::time::Duration;
 
+#[warn(clippy::pedantic)]
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
@@ -45,8 +46,8 @@ fn main() -> amethyst::Result<()> {
     let breakout_levels = LevelsData::load(&breakout_levels_path);
 
     let binding_path = app_root.join("config").join("bindings.ron");
-    let input_bundle = InputBundle::<StringBindings>::new()
-        .with_bindings_from_file(binding_path)?;
+    let input_bundle =
+        InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
 
     // Game Data setup
     let game_data = GameDataBuilder::default()
@@ -64,7 +65,7 @@ fn main() -> amethyst::Result<()> {
                 // RenderFlat2D plugin is used to render entities with a `SpriteRender` component.
                 .with_plugin(RenderFlat2D::default())
                 // UI
-                .with_plugin(RenderUi::default())
+                .with_plugin(RenderUi::default()),
         )?;
 
     let mut game = Application::build(assets_dir, MainMenu::default())?
@@ -78,7 +79,7 @@ fn main() -> amethyst::Result<()> {
         .with_resource(breakout_config.paddle)
         .with_resource(breakout_levels.levels)
         .build(game_data)?;
-        
+
     game.run();
 
     Ok(())

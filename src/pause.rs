@@ -2,11 +2,11 @@ use crate::main_menu::MainMenu;
 use crate::util::*;
 
 use amethyst::{
-    prelude::*,
-    input::{VirtualKeyCode, is_key_down, is_close_requested},
-    ui::{UiCreator, UiEvent, UiEventType, UiFinder},
-    shrev::EventChannel,
     ecs::prelude::{Entity, WorldExt},
+    input::{is_close_requested, is_key_down, VirtualKeyCode},
+    prelude::*,
+    shrev::EventChannel,
+    ui::{UiCreator, UiEvent, UiEventType, UiFinder},
 };
 
 const BUTTON_RESUME: &str = "resume";
@@ -25,21 +25,26 @@ impl SimpleState for PauseMenu {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let StateData { world, .. } = data;
 
-        self.ui_root = Some(world.exec(|mut creator: UiCreator<'_>| creator.create("ui/pause_menu.ron", ())));
+        self.ui_root =
+            Some(world.exec(|mut creator: UiCreator<'_>| creator.create("ui/pause_menu.ron", ())));
     }
 
-    fn handle_event(&mut self, state_data: StateData<'_, GameData<'_, '_>>, event: StateEvent) -> SimpleTrans {
+    fn handle_event(
+        &mut self,
+        state_data: StateData<'_, GameData<'_, '_>>,
+        event: StateEvent,
+    ) -> SimpleTrans {
         match event {
             StateEvent::Window(event) => {
                 if is_close_requested(&event) {
                     Trans::Quit
                 } else if is_key_down(&event, VirtualKeyCode::Escape) {
                     Trans::Pop
-                }else {
+                } else {
                     Trans::None
                 }
             }
-            
+
             StateEvent::Ui(UiEvent {
                 event_type: UiEventType::Click,
                 target,
@@ -59,7 +64,6 @@ impl SimpleState for PauseMenu {
                     state_transition_event_channel
                         .single_write(Box::new(|| Trans::Switch(Box::new(MainMenu::default()))));
 
-
                     Trans::None // we could also not add the pop to the channel and Pop here
                                 // but like this the execution order is guaranteed (in the next versions)
                 } else {
@@ -67,7 +71,7 @@ impl SimpleState for PauseMenu {
                 }
             }
 
-            _ => Trans::None
+            _ => Trans::None,
         }
     }
 

@@ -31,7 +31,16 @@ pub fn point_in_rect(x: f32, y: f32, left: f32, bottom: f32, right: f32, top: f3
 }
 
 // Checks to see if two line segments are parallel
-pub fn is_vector_parallel(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32, dx: f32, dy: f32) -> bool {
+pub fn is_vector_parallel(
+    ax: f32,
+    ay: f32,
+    bx: f32,
+    by: f32,
+    cx: f32,
+    cy: f32,
+    dx: f32,
+    dy: f32,
+) -> bool {
     let point_a = Vector2::new(ax, ay);
     let point_b = Vector2::new(bx, by);
     let point_c = Vector2::new(cx, cy);
@@ -44,23 +53,32 @@ pub fn is_vector_parallel(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32, 
 }
 
 // Checks to see if two line segments intersect. It is assumed parallels are checked elsewhere
-pub fn is_line_intersected(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32, dx: f32, dy: f32) -> bool {
+pub fn is_line_intersected(
+    ax: f32,
+    ay: f32,
+    bx: f32,
+    by: f32,
+    cx: f32,
+    cy: f32,
+    dx: f32,
+    dy: f32,
+) -> bool {
     // lines the same
     if ax == cx && ay == cy && bx == dx && by == dy {
         return true;
     }
 
     // do intersection test
-    let ta = ((cy - dy) * (ax - cx) + (dx - cx) * (ay - cy)) /
-            ((dx - cx) * (ay - by) - (ax - bx) * (dy - cy));
+    let ta = ((cy - dy) * (ax - cx) + (dx - cx) * (ay - cy))
+        / ((dx - cx) * (ay - by) - (ax - bx) * (dy - cy));
 
     // ta intersection is outside the bounds of the line segments
     if ta > 1.0 || ta < 0.0 {
         return false;
     }
 
-    let tb = ((ay - by) * (ax - cx) + (bx - ax) * (ay - cy)) /
-            ((dx - cx) * (ay - by) - (ax - bx) * (dy - cy));
+    let tb = ((ay - by) * (ax - cx) + (bx - ax) * (ay - cy))
+        / ((dx - cx) * (ay - by) - (ax - bx) * (dy - cy));
 
     // tb intersection is outside the bounds of the line segments
     if tb > 1.0 || ta < 0.0 {

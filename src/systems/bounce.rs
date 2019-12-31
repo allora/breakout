@@ -1,12 +1,12 @@
-use crate::game_objects::{Ball, Paddle, Block};
-use crate::config::ArenaConfig;
 use crate::breakout::PauseState;
+use crate::config::ArenaConfig;
+use crate::game_objects::{Ball, Block, Paddle};
 use crate::util::*;
 
 use amethyst::{
-    core::{Transform, SystemDesc},
+    core::{SystemDesc, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, WriteStorage, World},
+    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
 };
 
 /// This system is responsible for properly bouncing the ball off various surfaces
@@ -23,7 +23,10 @@ impl<'s> System<'s> for BounceSystem {
         Read<'s, PauseState>,
     );
 
-    fn run(&mut self, (mut balls, transforms, paddles, blocks, arena_config, pause_state): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut balls, transforms, paddles, blocks, arena_config, pause_state): Self::SystemData,
+    ) {
         if pause_state.paused {
             return;
         }
@@ -65,8 +68,7 @@ impl<'s> System<'s> for BounceSystem {
                     paddle_x + (paddle.width * 0.5) + ball.radius,
                     paddle_y + (paddle.height * 0.5) + ball.radius,
                 ) {
-                    if ball.velocity[1] < 0.0
-                    {
+                    if ball.velocity[1] < 0.0 {
                         ball.velocity[1] = -ball.velocity[1];
                     }
                 }
@@ -106,7 +108,6 @@ impl<'s> System<'s> for BounceSystem {
                         // bounce vertically
                         ball.velocity[1] = -ball.velocity[1];
                     }
-
                     // Test horizontal parallel
                     else if is_vector_parallel(
                         // left of block
@@ -125,7 +126,6 @@ impl<'s> System<'s> for BounceSystem {
                         // bounce horizontally
                         ball.velocity[0] = -ball.velocity[0];
                     }
-
                     // Test top line intersection
                     else if is_line_intersected(
                         // left of block
@@ -144,7 +144,6 @@ impl<'s> System<'s> for BounceSystem {
                         // bounce vertically
                         ball.velocity[1] = -ball.velocity[1];
                     }
-
                     // Test bottom line intersection
                     else if is_line_intersected(
                         // left of block
@@ -162,8 +161,7 @@ impl<'s> System<'s> for BounceSystem {
                     ) {
                         // bounce vertically
                         ball.velocity[1] = -ball.velocity[1];
-                    } else
-                    {
+                    } else {
                         // We dont have to test the rest. If we didnt cross top or bottom bounds,
                         // we crossed the sides and thus bounce horizontally
                         ball.velocity[0] = -ball.velocity[0];
@@ -176,4 +174,3 @@ impl<'s> System<'s> for BounceSystem {
         }
     }
 }
-
