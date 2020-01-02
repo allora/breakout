@@ -1,9 +1,13 @@
-use ::amethyst::ecs::{Component, DenseVecStorage};
+use ::amethyst::{
+    core::math::Vector2,
+    ecs::{Component, DenseVecStorage, NullStorage},
+};
 
 pub struct Ball {
-    pub velocity: [f32; 2],
+    pub velocity: Vector2<f32>,
     pub radius: f32,
     pub has_launched: bool,
+    pub last_position: Vector2<f32>,
 }
 
 impl Component for Ball {
@@ -31,4 +35,11 @@ pub struct Block {
 
 impl Component for Block {
     type Storage = DenseVecStorage<Self>;
+}
+
+#[derive(Default)]
+pub struct BreakoutRemovalTag;
+
+impl Component for BreakoutRemovalTag {
+    type Storage = NullStorage<Self>;
 }

@@ -1,6 +1,6 @@
-use crate::breakout::PauseState;
+use crate::components::Block;
 use crate::config::BlockConfig;
-use crate::game_objects::Block;
+use crate::data::PauseState;
 
 use amethyst::{
     core::SystemDesc,

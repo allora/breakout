@@ -1,5 +1,5 @@
-use crate::breakout::PauseState;
-use crate::game_objects::{Ball, Block};
+use crate::components::{Ball, Block};
+use crate::data::PauseState;
 use crate::util::point_in_rect;
 
 use amethyst::{

@@ -1,13 +1,13 @@
+use crate::components::*;
 use crate::config::{ArenaConfig, BallConfig, BlockConfig, LevelsConfig, PaddleConfig};
-use crate::game_objects::*;
-use crate::pause::PauseMenu;
+use crate::data::PauseState;
+use crate::states::PauseMenu;
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
-    core::transform::Transform,
+    core::{math::Vector2, transform::Transform},
     ecs::prelude::Join,
     ecs::world::EntitiesRes,
-    ecs::{Component, NullStorage},
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
@@ -26,18 +26,6 @@ impl Breakout {
             level_index: index,
         }
     }
-}
-
-#[derive(Default)]
-pub struct BreakoutRemovalTag;
-
-impl Component for BreakoutRemovalTag {
-    type Storage = NullStorage<Self>;
-}
-
-#[derive(Default)]
-pub struct PauseState {
-    pub paused: bool,
 }
 
 impl SimpleState for Breakout {
@@ -181,14 +169,14 @@ fn initialise_paddle(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>
 
     // Assign the sprite for the paddle
     let sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_sheet: sprite_sheet_handle,
         sprite_number: 0, // paddle is the first sprite in the sprite sheet
     };
 
     // Create a paddle entity.
     world
         .create_entity()
-        .with(sprite_render.clone())
+        .with(sprite_render)
         .with(Paddle {
             velocity: paddle_velocity,
             width: paddle_width,
@@ -220,18 +208,19 @@ fn initialise_ball(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>) 
 
     // Assign the sprites for the ball
     let sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_sheet: sprite_sheet_handle,
         sprite_number: 1, // ball is the second sprite in the sprite sheet
     };
 
     // Create a ball entity.
     world
         .create_entity()
-        .with(sprite_render.clone())
+        .with(sprite_render)
         .with(Ball {
             radius: ball_radius,
             has_launched: false,
-            velocity: [0.0, 0.0],
+            velocity: Vector2::new(0.0, 0.0),
+            last_position: Vector2::new(0.0, 0.0),
         })
         .with(transform)
         .with(BreakoutRemovalTag)
@@ -262,7 +251,7 @@ fn initialise_level(
 
     // Assign the sprites for the block
     let mut sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_sheet: sprite_sheet_handle,
         sprite_number: 2, // Block is the third sprite
     };
 

@@ -1,6 +1,6 @@
-use crate::breakout::PauseState;
+use crate::components::Paddle;
 use crate::config::ArenaConfig;
-use crate::game_objects::Paddle;
+use crate::data::PauseState;
 
 use amethyst::{
     core::{SystemDesc, Time, Transform},

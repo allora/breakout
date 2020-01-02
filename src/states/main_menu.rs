@@ -1,7 +1,7 @@
 extern crate amethyst;
 
-use crate::breakout::Breakout;
 use crate::config::LevelsConfig;
+use crate::states::Breakout;
 use crate::util::*;
 
 use std::cmp;
@@ -64,10 +64,8 @@ impl SimpleState for MainMenu {
 
                 let old_index = self.level_index;
 
-                if Some(target) == self.button_level_down {
-                    if self.level_index > 0 {
-                        self.level_index = cmp::max(self.level_index - 1, 0);
-                    }
+                if Some(target) == self.button_level_down && self.level_index > 0 {
+                    self.level_index = cmp::max(self.level_index - 1, 0);
                 }
 
                 if Some(target) == self.button_level_up {

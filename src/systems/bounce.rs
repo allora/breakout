@@ -1,10 +1,10 @@
-use crate::breakout::PauseState;
+use crate::components::{Ball, Block, Paddle};
 use crate::config::ArenaConfig;
-use crate::game_objects::{Ball, Block, Paddle};
+use crate::data::PauseState;
 use crate::util::*;
 
 use amethyst::{
-    core::{SystemDesc, Transform},
+    core::{math::*, SystemDesc, Transform},
     derive::SystemDesc,
     ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
 };
@@ -33,8 +33,21 @@ impl<'s> System<'s> for BounceSystem {
 
         // Iterate over all balls and test them for collisions
         for (ball, transform) in (&mut balls, &transforms).join() {
+            let mut ball_has_bounced = false;
+
             let ball_x = transform.translation().x;
             let ball_y = transform.translation().y;
+
+            let last_ball_pos = ball.last_position;
+            let adjusted_ball_pos = {
+                let cur_ball_pos = Vector2::new(ball_x, ball_y);
+
+                let ball_move_vector = cur_ball_pos - last_ball_pos;
+                let ball_move_adjusted_mag = ball_move_vector.magnitude() + ball.radius;
+                let adjusted_ball_vector = ball_move_vector.normalize() * ball_move_adjusted_mag;
+
+                last_ball_pos + adjusted_ball_vector
+            };
 
             let (arena_width, arena_height) = (arena_config.width, arena_config.height);
 
@@ -67,11 +80,16 @@ impl<'s> System<'s> for BounceSystem {
                     paddle_y - (paddle.height * 0.5) - ball.radius,
                     paddle_x + (paddle.width * 0.5) + ball.radius,
                     paddle_y + (paddle.height * 0.5) + ball.radius,
-                ) {
-                    if ball.velocity[1] < 0.0 {
-                        ball.velocity[1] = -ball.velocity[1];
-                    }
+                ) && ball.velocity[1] < 0.0
+                {
+                    ball.velocity[1] = -ball.velocity[1];
+                    ball_has_bounced = true;
+                    break;
                 }
+            }
+
+            if ball_has_bounced {
+                break;
             }
 
             // bounce off a block
@@ -90,20 +108,36 @@ impl<'s> System<'s> for BounceSystem {
                     ball_x + (block.width * 0.5) + ball.radius,
                     ball_y + (block.height * 0.5) + ball.radius,
                 ) {
+                    let block_top_right = Vector2::new(
+                        block_x + block.width * 0.5 + ball.radius,
+                        block_y + block.height * 0.5 + ball.radius,
+                    );
+
+                    let block_top_left = Vector2::new(
+                        block_x - block.width * 0.5 - ball.radius,
+                        block_y + block.height * 0.5 + ball.radius,
+                    );
+
+                    let block_bottom_right = Vector2::new(
+                        block_x + block.width * 0.5 + ball.radius,
+                        block_y - block.height * 0.5 - ball.radius,
+                    );
+
+                    let block_bottom_left = Vector2::new(
+                        block_x - block.width * 0.5 - ball.radius,
+                        block_y - block.height * 0.5 - ball.radius,
+                    );
+
                     // Test vertical parallel
                     if is_vector_parallel(
                         // top of block
-                        block_x,
-                        block_y + block.height * 0.5,
+                        block_top_right,
                         // bottom of block
-                        block_x,
-                        block_y - block.height * 0.5,
+                        block_bottom_right,
                         // last ball pos
-                        ball_x - ball.velocity[0],
-                        ball_y - ball.velocity[1],
+                        last_ball_pos,
                         //cur ball pos
-                        ball_x,
-                        ball_y,
+                        adjusted_ball_pos,
                     ) {
                         // bounce vertically
                         ball.velocity[1] = -ball.velocity[1];
@@ -111,54 +145,40 @@ impl<'s> System<'s> for BounceSystem {
                     // Test horizontal parallel
                     else if is_vector_parallel(
                         // left of block
-                        block_x - block.width * 0.5,
-                        block_y,
+                        block_top_left,
                         // right of block
-                        block_x + block.width * 0.5,
-                        block_y,
+                        block_top_right,
                         // last ball pos
-                        ball_x - ball.velocity[0],
-                        ball_y - ball.velocity[1],
+                        last_ball_pos,
                         //cur ball pos
-                        ball_x,
-                        ball_y,
+                        adjusted_ball_pos,
                     ) {
                         // bounce horizontally
                         ball.velocity[0] = -ball.velocity[0];
                     }
                     // Test top line intersection
                     else if is_line_intersected(
-                        // left of block
-                        block_x - block.width * 0.5 - ball.radius,
-                        block_y + block.height * 0.5 + ball.radius,
-                        // right of block
-                        block_x + block.width * 0.5 + ball.radius,
-                        block_y + block.height * 0.5 + ball.radius,
-                        // last ball pos
-                        ball_x - ball.velocity[0],
-                        ball_y - ball.velocity[1],
-                        //cur ball pos
-                        ball_x,
-                        ball_y,
-                    ) {
-                        // bounce vertically
-                        ball.velocity[1] = -ball.velocity[1];
-                    }
-                    // Test bottom line intersection
-                    else if is_line_intersected(
-                        // left of block
-                        block_x - block.width * 0.5 - ball.radius,
-                        block_y - block.height * 0.5 - ball.radius,
-                        // right of block
-                        block_x + block.width * 0.5 + ball.radius,
-                        block_y - block.height * 0.5 - ball.radius,
-                        // last ball pos
-                        ball_x - ball.velocity[0],
-                        ball_y - ball.velocity[1],
-                        //cur ball pos
-                        ball_x,
-                        ball_y,
-                    ) {
+                            // left of block
+                            block_top_left,
+                            // right of block
+                            block_top_right,
+                            // last ball pos
+                            last_ball_pos,
+                            //cur ball pos
+                            adjusted_ball_pos,
+                        )
+                        // Test bottom line intersection
+                        || is_line_intersected(
+                            // left of block
+                            block_bottom_left,
+                            // right of block
+                            block_bottom_right,
+                            // last ball pos
+                            last_ball_pos,
+                            //cur ball pos
+                            adjusted_ball_pos,
+                        )
+                    {
                         // bounce vertically
                         ball.velocity[1] = -ball.velocity[1];
                     } else {

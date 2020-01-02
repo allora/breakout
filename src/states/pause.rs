@@ -1,4 +1,4 @@
-use crate::main_menu::MainMenu;
+use crate::states::MainMenu;
 use crate::util::*;
 
 use amethyst::{
@@ -50,9 +50,9 @@ impl SimpleState for PauseMenu {
                 target,
             }) => {
                 if Some(target) == self.button_resume {
-                    return Trans::Pop;
+                    Trans::Pop
                 } else if Some(target) == self.button_quit_app {
-                    return Trans::Quit;
+                    Trans::Quit
                 } else if Some(target) == self.button_quit_to_menu {
                     let mut state_transition_event_channel = state_data
                         .world

@@ -1,9 +1,8 @@
-mod breakout;
 mod bundle;
+mod components;
 mod config;
-mod game_objects;
-mod main_menu;
-mod pause;
+mod data;
+mod states;
 mod systems;
 mod util;
 
@@ -22,14 +21,13 @@ use amethyst::{
 
 use crate::bundle::BreakoutBundle;
 use crate::config::{BreakoutConfig, LevelsData};
+use crate::states::MainMenu;
 
 use std::time::Duration;
 
 #[warn(clippy::pedantic)]
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
-
-    use crate::main_menu::MainMenu;
 
     // Config setup
     let app_root = application_root_dir()?;

@@ -1,5 +1,5 @@
-use crate::breakout::PauseState;
-use crate::game_objects::{Ball, Paddle};
+use crate::components::{Ball, Paddle};
+use crate::data::PauseState;
 
 use amethyst::{
     core::{SystemDesc, Time, Transform},
@@ -41,24 +41,30 @@ impl<'s> System<'s> for MoveBallSystem {
         for (ball, transform) in (&mut balls, &mut transforms).join() {
             let opt_launch = input.action_is_down("launch_ball").unwrap_or(false);
 
+            ball.last_position.x = transform.translation().x;
+            ball.last_position.y = transform.translation().y;
+
             if !ball.has_launched {
                 if opt_launch {
                     println!("Launch Ball!");
-                    ball.velocity = [300.0, 300.0];
+                    ball.velocity.x = 300.0;
+                    ball.velocity.y = 300.0;
                     ball.has_launched = true;
                 } else {
                     transform.set_translation_x(paddle_x);
                     transform.set_translation_y(paddle_y + ball.radius);
                 }
             }
+
             if ball.has_launched {
-                transform.prepend_translation_x(ball.velocity[0] * time.delta_seconds());
-                transform.prepend_translation_y(ball.velocity[1] * time.delta_seconds());
+                transform.prepend_translation_x(ball.velocity.x * time.delta_seconds());
+                transform.prepend_translation_y(ball.velocity.y * time.delta_seconds());
 
                 let ball_y = transform.translation().y;
 
                 if ball_y < ball.radius {
-                    ball.velocity = [0.0, 0.0];
+                    ball.velocity.x = 0.0;
+                    ball.velocity.y = 0.0;
                     ball.has_launched = false;
                     println!("Died!");
                 }
