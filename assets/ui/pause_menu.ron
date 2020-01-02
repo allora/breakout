@@ -13,8 +13,49 @@ Container(
 
         Container(
             transform: (
+                id: "container_score",
+                y: 200,
+                width: 280.,
+                height: 40.,
+                anchor: Middle,
+            ),
+            background: SolidColor(1.0, 0.65, 0.0, 1.0),
+            children: [
+
+                Container(
+                    transform: (
+                        id: "container_score",
+                        width: 275.,
+                        height: 35.,
+                        anchor: Middle,
+                    ),
+                    background: SolidColor(0.0, 0.0, 0.0, 1.0),
+
+                    children: [
+                        Label(
+                            transform: (
+                                id: "score_text",
+                                width: 275.,
+                                height: 35.,
+                                anchor: Middle,
+                            ),
+                            text: (
+                                text: "SCORE 0",
+                                font: File("fonts/square.ttf", ("TTF", ())),
+                                font_size: 25.,
+                                color: (1.0, 0.65, 0., 1.0),
+                                align: Middle,
+                            ),
+                        ),
+                    ],
+                ),
+            ]
+        ),
+
+        Container(
+            transform: (
                 id: "container_resume",
-                y: 150,
+                y: 100,
                 width: 290.,
                 height: 80.,
                 anchor: Middle,
@@ -80,7 +121,7 @@ Container(
         Container(
             transform: (
                 id: "container_quit_app",
-                y: -150,
+                y: -100,
                 width: 290.,
                 height: 80.,
                 anchor: Middle,

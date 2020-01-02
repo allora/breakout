@@ -1,17 +1,19 @@
 use crate::states::MainMenu;
 use crate::util::*;
+use crate::data::ScoreBoard;
 
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
     shrev::EventChannel,
-    ui::{UiCreator, UiEvent, UiEventType, UiFinder},
+    ui::{UiCreator, UiEvent, UiEventType, UiFinder, UiText},
 };
 
 const BUTTON_RESUME: &str = "resume";
 const BUTTON_QUIT: &str = "game_quit";
 const BUTTON_QUIT_TO_MENU: &str = "level_quit_to_menu";
+const TEXT_LEVEL_INDEX: &str = "score_text";
 
 #[derive(Default, Debug)]
 pub struct PauseMenu {
@@ -19,6 +21,7 @@ pub struct PauseMenu {
     button_resume: Option<Entity>,
     button_quit_to_menu: Option<Entity>,
     button_quit_app: Option<Entity>,
+    text_score: Option<Entity>,
 }
 
 impl SimpleState for PauseMenu {
@@ -82,12 +85,27 @@ impl SimpleState for PauseMenu {
         if self.button_resume.is_none()
             || self.button_quit_app.is_none()
             || self.button_quit_to_menu.is_none()
+            || self.text_score.is_none()
         {
             world.exec(|ui_finder: UiFinder<'_>| {
                 self.button_resume = ui_finder.find(BUTTON_RESUME);
                 self.button_quit_app = ui_finder.find(BUTTON_QUIT);
                 self.button_quit_to_menu = ui_finder.find(BUTTON_QUIT_TO_MENU);
+                self.text_score = ui_finder.find(TEXT_LEVEL_INDEX);
             });
+        }
+
+        let score_board = &world.read_resource::<ScoreBoard>();
+        let mut ui_text = world.write_storage::<UiText>();
+        {
+            if let Some(text) = self
+                .text_score
+                .and_then(|entity: Entity| ui_text.get_mut(entity))
+            {
+                let score_string = "SCORE: ";
+                
+                text.text = format!("{}{}", score_string, (score_board.current_score * 100).to_string());
+            }
         }
 
         Trans::None
@@ -102,5 +120,6 @@ impl SimpleState for PauseMenu {
         self.button_resume = None;
         self.button_quit_app = None;
         self.button_quit_to_menu = None;
+        self.text_score = None;
     }
 }

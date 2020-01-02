@@ -1,11 +1,13 @@
 use crate::components::{Ball, Block};
-use crate::data::PauseState;
+use crate::data::{PauseState, ScoreBoard};
 use crate::util::point_in_rect;
 
 use amethyst::{
     core::{SystemDesc, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Entities, Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
+    ecs::prelude::{
+        Entities, Join, Read, ReadStorage, System, SystemData, World, Write, WriteStorage,
+    },
 };
 
 /// This system is responsible for tracking block health
@@ -19,9 +21,13 @@ impl<'s> System<'s> for BlockSystem {
         ReadStorage<'s, Ball>,
         ReadStorage<'s, Transform>,
         Read<'s, PauseState>,
+        Write<'s, ScoreBoard>,
     );
 
-    fn run(&mut self, (entities, mut blocks, balls, transforms, pause_state): Self::SystemData) {
+    fn run(
+        &mut self,
+        (entities, mut blocks, balls, transforms, pause_state, mut score_board): Self::SystemData,
+    ) {
         if pause_state.paused {
             return;
         }
@@ -33,6 +39,7 @@ impl<'s> System<'s> for BlockSystem {
 
             for (e, block, block_transform) in (&entities, &mut blocks, &transforms).join() {
                 if block.cur_hits >= block.max_hits {
+                    score_board.current_score += block.max_hits;
                     entities.delete(e).expect("entity deleted");
                 } else {
                     let block_x = block_transform.translation().x;

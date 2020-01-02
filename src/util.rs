@@ -1,5 +1,7 @@
 use std::iter;
 
+use float_cmp::*;
+
 use amethyst::{
     core::{math::*, transform::ParentHierarchy},
     ecs::{
@@ -40,7 +42,7 @@ pub fn is_vector_parallel(
     let line_ab = a - b;
     let line_cd = c - d;
 
-    line_ab.dot(&line_cd) == 1.0
+    approx_eq!(f32, line_ab.dot(&line_cd), 1.0)
 }
 
 // Checks to see if two line segments intersect. It is assumed parallels are checked elsewhere
@@ -51,7 +53,10 @@ pub fn is_line_intersected(
     d: Vector2<f32>,
 ) -> bool {
     // lines the same
-    if a.x == c.x && a.y == c.y && b.x == d.x && b.y == d.y {
+    if approx_eq!(f32, a.x, c.x) 
+        && approx_eq!(f32, a.y, c.y)
+        && approx_eq!(f32, b.x, d.x)
+        && approx_eq!(f32, b.y, d.y) {
         return true;
     }
 

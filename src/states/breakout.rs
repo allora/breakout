@@ -1,6 +1,6 @@
 use crate::components::*;
 use crate::config::{ArenaConfig, BallConfig, BlockConfig, LevelsConfig, PaddleConfig};
-use crate::data::PauseState;
+use crate::data::{PauseState, ScoreBoard};
 use crate::states::PauseMenu;
 
 use amethyst::{
@@ -40,9 +40,13 @@ impl SimpleState for Breakout {
         self.sprite_sheet_handle.replace(load_sprite_sheet(world));
 
         // Set initial pause bool
-        let pause_state = PauseState { paused: true };
+        let pause_state = PauseState { paused: false };
 
-        let _ = world.entry::<PauseState>().or_insert_with(|| pause_state);
+        // Set initial score
+        let score_board = ScoreBoard { current_score: 0 };
+
+        world.insert(pause_state);
+        world.insert(score_board);
 
         initialise_level(
             world,

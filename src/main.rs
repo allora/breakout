@@ -25,7 +25,6 @@ use crate::states::MainMenu;
 
 use std::time::Duration;
 
-#[warn(clippy::pedantic)]
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
