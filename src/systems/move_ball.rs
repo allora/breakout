@@ -1,10 +1,10 @@
 use crate::components::{Ball, Paddle};
-use crate::data::PauseState;
+use crate::data::{LevelInfo, PauseState};
 
 use amethyst::{
     core::{SystemDesc, Time, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, Write, WriteStorage},
     input::{InputHandler, StringBindings},
 };
 
@@ -20,11 +20,12 @@ impl<'s> System<'s> for MoveBallSystem {
         Read<'s, InputHandler<StringBindings>>,
         Read<'s, Time>,
         Read<'s, PauseState>,
+        Write<'s, LevelInfo>,
     );
 
     fn run(
         &mut self,
-        (mut balls, mut transforms, paddles, input, time, pause_state): Self::SystemData,
+        (mut balls, mut transforms, paddles, input, time, pause_state, mut level_info): Self::SystemData,
     ) {
         if pause_state.paused {
             return;
@@ -63,6 +64,7 @@ impl<'s> System<'s> for MoveBallSystem {
                 let ball_y = transform.translation().y;
 
                 if ball_y < ball.radius {
+                    level_info.num_lives_remaining = (level_info.num_lives_remaining - 1).max(0);
                     ball.velocity.x = 0.0;
                     ball.velocity.y = 0.0;
                     ball.has_launched = false;

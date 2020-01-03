@@ -1,48 +1,45 @@
+extern crate amethyst;
+
 use crate::data::ScoreBoard;
 use crate::states::MainMenu;
 use crate::util::*;
 
 use amethyst::{
     ecs::prelude::{Entity, WorldExt},
-    input::{is_close_requested, is_key_down, VirtualKeyCode},
+    input::is_close_requested,
     prelude::*,
-    shrev::EventChannel,
     ui::{UiCreator, UiEvent, UiEventType, UiFinder, UiText},
 };
 
-const BUTTON_RESUME: &str = "resume";
 const BUTTON_QUIT: &str = "game_quit";
 const BUTTON_QUIT_TO_MENU: &str = "level_quit_to_menu";
 const TEXT_LEVEL_INDEX: &str = "score_text";
 
 #[derive(Default, Debug)]
-pub struct PauseMenu {
+pub struct Results {
     ui_root: Option<Entity>,
-    button_resume: Option<Entity>,
     button_quit_to_menu: Option<Entity>,
     button_quit_app: Option<Entity>,
     text_score: Option<Entity>,
 }
 
-impl SimpleState for PauseMenu {
+impl SimpleState for Results {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let StateData { world, .. } = data;
 
         self.ui_root =
-            Some(world.exec(|mut creator: UiCreator<'_>| creator.create("ui/pause_menu.ron", ())));
+            Some(world.exec(|mut creator: UiCreator<'_>| creator.create("ui/results.ron", ())));
     }
 
     fn handle_event(
         &mut self,
-        state_data: StateData<'_, GameData<'_, '_>>,
+        _: StateData<'_, GameData<'_, '_>>,
         event: StateEvent,
     ) -> SimpleTrans {
         match event {
             StateEvent::Window(event) => {
                 if is_close_requested(&event) {
                     Trans::Quit
-                } else if is_key_down(&event, VirtualKeyCode::Escape) {
-                    Trans::Pop
                 } else {
                     Trans::None
                 }
@@ -52,23 +49,10 @@ impl SimpleState for PauseMenu {
                 event_type: UiEventType::Click,
                 target,
             }) => {
-                if Some(target) == self.button_resume {
-                    Trans::Pop
-                } else if Some(target) == self.button_quit_app {
+                if Some(target) == self.button_quit_app {
                     Trans::Quit
                 } else if Some(target) == self.button_quit_to_menu {
-                    let mut state_transition_event_channel = state_data
-                        .world
-                        .write_resource::<EventChannel<TransEvent<GameData, StateEvent>>>();
-
-                    // this allows us to first 'Pop' this state, and then exchange whatever was
-                    // below that with a new MainMenu state.
-                    state_transition_event_channel.single_write(Box::new(|| Trans::Pop));
-                    state_transition_event_channel
-                        .single_write(Box::new(|| Trans::Switch(Box::new(MainMenu::default()))));
-
-                    Trans::None // we could also not add the pop to the channel and Pop here
-                                // but like this the execution order is guaranteed (in the next versions)
+                    Trans::Switch(Box::new(MainMenu::default()))
                 } else {
                     Trans::None
                 }
@@ -82,13 +66,11 @@ impl SimpleState for PauseMenu {
         // only search for buttons if they have not been found yet
         let StateData { world, .. } = state_data;
 
-        if self.button_resume.is_none()
-            || self.button_quit_app.is_none()
+        if self.button_quit_app.is_none()
             || self.button_quit_to_menu.is_none()
             || self.text_score.is_none()
         {
             world.exec(|ui_finder: UiFinder<'_>| {
-                self.button_resume = ui_finder.find(BUTTON_RESUME);
                 self.button_quit_app = ui_finder.find(BUTTON_QUIT);
                 self.button_quit_to_menu = ui_finder.find(BUTTON_QUIT_TO_MENU);
                 self.text_score = ui_finder.find(TEXT_LEVEL_INDEX);
@@ -121,7 +103,6 @@ impl SimpleState for PauseMenu {
             delete_hierarchy(entity, data.world).expect("Failed to remove PauseMenu");
         }
         self.ui_root = None;
-        self.button_resume = None;
         self.button_quit_app = None;
         self.button_quit_to_menu = None;
         self.text_score = None;

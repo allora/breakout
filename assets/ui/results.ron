@@ -1,0 +1,121 @@
+#![enable(implicit_some)]
+// Detailed field information can be found at https://docs.amethyst.rs/master/amethyst_ui/enum.UiWidget.html and related pages
+Container(
+    transform: (
+        id: "background",
+        anchor: Middle,
+        stretch: XY( x_margin: 0., y_margin: 0., keep_aspect_ratio: false),
+        width: 20.,
+        height: 20.,
+    ),
+    background: SolidColor(0.025, 0.02, 0.02, 0.8),
+    children: [
+
+        Container(
+            transform: (
+                id: "container_score",
+                y: 200,
+                width: 280.,
+                height: 40.,
+                anchor: Middle,
+            ),
+            background: SolidColor(1.0, 0.65, 0.0, 1.0),
+            children: [
+
+                Container(
+                    transform: (
+                        id: "container_score",
+                        width: 275.,
+                        height: 35.,
+                        anchor: Middle,
+                    ),
+                    background: SolidColor(0.0, 0.0, 0.0, 1.0),
+
+                    children: [
+                        Label(
+                            transform: (
+                                id: "score_text",
+                                width: 275.,
+                                height: 35.,
+                                anchor: Middle,
+                            ),
+                            text: (
+                                text: "SCORE 0",
+                                font: File("fonts/square.ttf", ("TTF", ())),
+                                font_size: 25.,
+                                color: (1.0, 0.65, 0., 1.0),
+                                align: Middle,
+                            ),
+                        ),
+                    ],
+                ),
+            ]
+        ),
+
+                Container(
+            transform: (
+                id: "container_quit_menu",
+                y: 0,
+                width: 290.,
+                height: 80.,
+                anchor: Middle,
+            ),
+            background: SolidColor(1.0, 0.65, 0.0, 1.0),
+            children: [
+
+                Button(
+                    transform: (
+                        id: "level_quit_to_menu",
+                        width: 285.,
+                        height: 75.,
+                        tab_order: 1,
+                        anchor: Middle,
+                        mouse_reactive: true,
+                    ),
+                    button: (
+                        text: "QUIT TO MENU",
+                        font: File("fonts/square.ttf", ("TTF", ())),
+                        font_size: 35.,
+                        normal_text_color: (1.0, 0.65, 0., 1.0), // ffa500
+                        normal_image: SolidColor(0., 0., 0., 1.),
+                        hover_image: SolidColor(0.1, 0.1, 0.1, 1.),
+                        press_image: SolidColor(0.15, 0.15, 0.15, 1.),
+                    )
+                ),
+            ]
+        ),
+
+        Container(
+            transform: (
+                id: "container_quit_app",
+                y: -90,
+                width: 290.,
+                height: 80.,
+                anchor: Middle,
+            ),
+            background: SolidColor(1.0, 0.65, 0.0, 1.0),
+            children: [
+
+                Button(
+                    transform: (
+                        id: "game_quit",
+                        width: 285.,
+                        height: 75.,
+                        tab_order: 1,
+                        anchor: Middle,
+                        mouse_reactive: true,
+                    ),
+                    button: (
+                        text: "QUIT GAME",
+                        font: File("fonts/square.ttf", ("TTF", ())),
+                        font_size: 35.,
+                        normal_text_color: (1.0, 0.65, 0., 1.0), // ffa500
+                        normal_image: SolidColor(0., 0., 0., 1.),
+                        hover_image: SolidColor(0.1, 0.1, 0.1, 1.),
+                        press_image: SolidColor(0.15, 0.15, 0.15, 1.),
+                    )
+                ),
+            ]
+        ),
+    ],
+)

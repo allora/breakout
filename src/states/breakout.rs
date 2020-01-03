@@ -1,7 +1,7 @@
 use crate::components::*;
 use crate::config::{ArenaConfig, BallConfig, BlockConfig, LevelsConfig, PaddleConfig};
-use crate::data::{PauseState, ScoreBoard};
-use crate::states::PauseMenu;
+use crate::data::{LevelInfo, PauseState, ScoreBoard};
+use crate::states::{PauseMenu, Results};
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
@@ -45,6 +45,12 @@ impl SimpleState for Breakout {
         // Set initial score
         let score_board = ScoreBoard { current_score: 0 };
 
+        // Init block count
+        let mut level_info = LevelInfo {
+            num_blocks_remaining: 0,
+            num_lives_remaining: 3,
+        };
+
         world.insert(pause_state);
         world.insert(score_board);
 
@@ -52,10 +58,27 @@ impl SimpleState for Breakout {
             world,
             self.sprite_sheet_handle.clone().unwrap(),
             self.level_index,
+            &mut level_info.num_blocks_remaining,
         );
-        initialise_paddle(world, self.sprite_sheet_handle.clone().unwrap());
+
+        world.insert(level_info);
+
         initialise_ball(world, self.sprite_sheet_handle.clone().unwrap());
+        initialise_paddle(world, self.sprite_sheet_handle.clone().unwrap());
         initialise_camera(world);
+    }
+
+    fn update(&mut self, state_data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
+        // only search for buttons if they have not been found yet
+        let StateData { world, .. } = state_data;
+
+        let level_info = &world.read_resource::<LevelInfo>();
+
+        if level_info.num_lives_remaining == 0 || level_info.num_blocks_remaining == 0 {
+            return Trans::Switch(Box::new(Results::default()));
+        }
+
+        Trans::None
     }
 
     fn handle_event(
@@ -236,6 +259,7 @@ fn initialise_level(
     world: &mut World,
     sprite_sheet_handle: Handle<SpriteSheet>,
     level_index: usize,
+    block_count: &mut i32,
 ) {
     // Load configs
     let block_positions = {
@@ -288,6 +312,9 @@ fn initialise_level(
             };
 
             sprite_render.sprite_number = block_damage_states[block.cur_damage_state].0;
+
+            // increment block counter
+            *block_count += 1;
 
             world
                 .create_entity()

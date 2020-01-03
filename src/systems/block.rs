@@ -1,5 +1,5 @@
 use crate::components::{Ball, Block};
-use crate::data::{PauseState, ScoreBoard};
+use crate::data::{LevelInfo, PauseState, ScoreBoard};
 use crate::util::point_in_rect;
 
 use amethyst::{
@@ -22,11 +22,12 @@ impl<'s> System<'s> for BlockSystem {
         ReadStorage<'s, Transform>,
         Read<'s, PauseState>,
         Write<'s, ScoreBoard>,
+        Write<'s, LevelInfo>,
     );
 
     fn run(
         &mut self,
-        (entities, mut blocks, balls, transforms, pause_state, mut score_board): Self::SystemData,
+        (entities, mut blocks, balls, transforms, pause_state, mut score_board, mut level_info): Self::SystemData,
     ) {
         if pause_state.paused {
             return;
@@ -40,6 +41,7 @@ impl<'s> System<'s> for BlockSystem {
             for (e, block, block_transform) in (&entities, &mut blocks, &transforms).join() {
                 if block.cur_hits >= block.max_hits {
                     score_board.current_score += block.max_hits;
+                    level_info.num_blocks_remaining = (level_info.num_blocks_remaining - 1).max(0);
                     entities.delete(e).expect("entity deleted");
                 } else {
                     let block_x = block_transform.translation().x;

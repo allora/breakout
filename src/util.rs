@@ -53,10 +53,11 @@ pub fn is_line_intersected(
     d: Vector2<f32>,
 ) -> bool {
     // lines the same
-    if approx_eq!(f32, a.x, c.x) 
+    if approx_eq!(f32, a.x, c.x)
         && approx_eq!(f32, a.y, c.y)
         && approx_eq!(f32, b.x, d.x)
-        && approx_eq!(f32, b.y, d.y) {
+        && approx_eq!(f32, b.y, d.y)
+    {
         return true;
     }
 
