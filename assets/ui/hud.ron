@@ -14,12 +14,12 @@ Container(
         Container(
             transform: (
                 id: "container_hud",
-                y: -270.,
+                y: 20.,
                 x: 0.,
                 z: 0.,
                 width: 280.,
                 height: 40.,
-                anchor: Middle,
+                anchor: BottomMiddle,
             ),
             background: SolidColor(0.0, 0.0, 0.0, 0.0),
             children: [

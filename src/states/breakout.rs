@@ -261,7 +261,7 @@ fn initialise_paddle(world: &mut World, sprite_sheet_handle: Handle<SpriteSheet>
 
     // Correctly position the paddle.
     let y = arena_paddle_pos;
-    transform.set_translation_xyz((paddle_width * 0.5) + (arena_width * 0.5), y, 0.0);
+    transform.set_translation_xyz((paddle_width * 0.5) + (arena_width * 0.5), y, 0.1);
 
     // Assign the sprite for the paddle
     let sprite_render = SpriteRender {
@@ -369,7 +369,7 @@ fn initialise_level(
             transform.set_translation_xyz(
                 (block_width * 0.5) + x,
                 (arena_height - y) - (block_height * 0.5),
-                -0.1,
+                0.1,
             );
 
             let block = Block {
