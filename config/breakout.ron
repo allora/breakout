@@ -2,7 +2,7 @@
     arena: (
         width: 480.0,
         height: 600.0,
-        paddlepos: 50.0,
+        paddlepos: 80.0,
     ),
 
     ball: (

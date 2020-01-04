@@ -2,21 +2,29 @@ use crate::components::*;
 use crate::config::{ArenaConfig, BallConfig, BlockConfig, LevelsConfig, PaddleConfig};
 use crate::data::{LevelInfo, PauseState, ScoreBoard};
 use crate::states::{PauseMenu, Results};
+use crate::util::delete_hierarchy;
 
 use amethyst::{
     assets::{AssetStorage, Handle, Loader},
     core::{math::Vector2, transform::Transform},
-    ecs::prelude::Join,
+    ecs::prelude::{Entity, Join},
     ecs::world::EntitiesRes,
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    ui::{UiCreator, UiFinder, UiText},
 };
+
+const TEXT_SCORE: &str = "score_text";
+const TEXT_LIVES: &str = "lives_text";
 
 #[derive(Default)]
 pub struct Breakout {
     sprite_sheet_handle: Option<Handle<SpriteSheet>>,
     level_index: usize,
+    ui_root: Option<Entity>,
+    score_text: Option<Entity>,
+    lives_text: Option<Entity>,
 }
 
 impl Breakout {
@@ -24,6 +32,9 @@ impl Breakout {
         Breakout {
             sprite_sheet_handle: None,
             level_index: index,
+            ui_root: None,
+            score_text: None,
+            lives_text: None,
         }
     }
 }
@@ -31,6 +42,9 @@ impl Breakout {
 impl SimpleState for Breakout {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let StateData { world, .. } = data;
+
+        self.ui_root =
+            Some(world.exec(|mut creator: UiCreator<'_>| creator.create("ui/hud.ron", ())));
 
         world.register::<BreakoutRemovalTag>();
 
@@ -72,7 +86,52 @@ impl SimpleState for Breakout {
         // only search for buttons if they have not been found yet
         let StateData { world, .. } = state_data;
 
+        if self.lives_text.is_none()
+        || self.score_text.is_none()
+        {
+            world.exec(|ui_finder: UiFinder<'_>| {
+                self.lives_text = ui_finder.find(TEXT_LIVES);
+                self.score_text = ui_finder.find(TEXT_SCORE);
+            });
+        }
+
         let level_info = &world.read_resource::<LevelInfo>();
+        {
+            let mut ui_text = world.write_storage::<UiText>();
+            {
+                if let Some(text) = self
+                    .lives_text
+                    .and_then(|entity: Entity| ui_text.get_mut(entity))
+                {
+                    let lives_string = "LIVES: ";
+
+                    text.text = format!(
+                        "{}{}",
+                        lives_string,
+                        level_info.num_lives_remaining.to_string()
+                    );
+                }
+            }
+        }
+
+        let score_board = &world.read_resource::<ScoreBoard>();
+        {
+            let mut ui_text = world.write_storage::<UiText>();
+            {
+                if let Some(text) = self
+                    .score_text
+                    .and_then(|entity: Entity| ui_text.get_mut(entity))
+                {
+                    let score_string = "SCORE: ";
+
+                    text.text = format!(
+                        "{}{}",
+                        score_string,
+                        (score_board.current_score * 100).to_string()
+                    );
+                }
+            }
+        }
 
         if level_info.num_lives_remaining == 0 || level_info.num_blocks_remaining == 0 {
             return Trans::Switch(Box::new(Results::default()));
@@ -116,6 +175,16 @@ impl SimpleState for Breakout {
     }
 
     fn on_stop(&mut self, data: StateData<GameData>) {
+        // Delete UI
+        // after destroying the current UI, invalidate references as well (makes things cleaner)
+        if let Some(entity) = self.ui_root {
+            delete_hierarchy(entity, data.world).expect("Failed to remove MainMenu");
+        }
+        self.ui_root = None;
+        self.score_text = None;
+        self.lives_text = None;
+
+        // Delete gameplay entities
         let entities = data.world.read_resource::<EntitiesRes>();
         let removal_tags = data.world.read_storage::<BreakoutRemovalTag>();
 

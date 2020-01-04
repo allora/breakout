@@ -1,0 +1,62 @@
+#![enable(implicit_some)]
+// Detailed field information can be found at https://docs.amethyst.rs/master/amethyst_ui/enum.UiWidget.html and related pages
+Container(
+    transform: (
+        id: "background",
+        anchor: Middle,
+        stretch: XY( x_margin: 0., y_margin: 0., keep_aspect_ratio: false),
+        width: 20.,
+        height: 20.,
+    ),
+    background: SolidColor(0.0, 0.0, 0.0, 0.0),
+    children: [
+
+        Container(
+            transform: (
+                id: "container_hud",
+                y: -270.,
+                x: 0.,
+                z: 0.,
+                width: 280.,
+                height: 40.,
+                anchor: Middle,
+            ),
+            background: SolidColor(0.0, 0.0, 0.0, 0.0),
+            children: [
+                Label(
+                    transform: (
+                        id: "score_text",
+                        x: -100.,
+                        width: 275.,
+                        height: 35.,
+                        anchor: Middle,
+                    ),
+                    text: (
+                        text: "SCORE 0",
+                        font: File("fonts/square.ttf", ("TTF", ())),
+                        font_size: 25.,
+                        color: (1.0, 0.65, 0., 1.0),
+                        align: Middle,
+                    ),
+                ),
+
+                Label(
+                    transform: (
+                        id: "lives_text",
+                        x: 100.,
+                        width: 275.,
+                        height: 35.,
+                        anchor: Middle,
+                    ),
+                    text: (
+                        text: "LIVES 0",
+                        font: File("fonts/square.ttf", ("TTF", ())),
+                        font_size: 25.,
+                        color: (1.0, 0.65, 0., 1.0),
+                        align: Middle,
+                    ),
+                ),
+            ],
+        ),
+    ],
+)
