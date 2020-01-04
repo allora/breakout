@@ -4,7 +4,9 @@ use crate::data::{LevelInfo, PauseState};
 use amethyst::{
     core::{SystemDesc, Time, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, ResourceId, World, Write, WriteStorage},
+    ecs::prelude::{
+        Join, Read, ReadStorage, ResourceId, System, SystemData, World, Write, WriteStorage,
+    },
     input::{InputHandler, StringBindings},
 };
 

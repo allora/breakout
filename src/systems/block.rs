@@ -6,7 +6,8 @@ use amethyst::{
     core::{SystemDesc, Transform},
     derive::SystemDesc,
     ecs::prelude::{
-        Entities, Join, Read, ReadStorage, System, SystemData, ResourceId, World, Write, WriteStorage,
+        Entities, Join, Read, ReadStorage, ResourceId, System, SystemData, World, Write,
+        WriteStorage,
     },
 };
 
@@ -18,7 +19,7 @@ pub struct BlockSystemData<'s> {
     pub transforms: ReadStorage<'s, Transform>,
     pub pause_state: Read<'s, PauseState>,
     pub score_board: Write<'s, ScoreBoard>,
-    pub level_info: Write<'s, LevelInfo>,   
+    pub level_info: Write<'s, LevelInfo>,
 }
 
 /// This system is responsible for tracking block health
@@ -36,7 +37,7 @@ impl<'s> System<'s> for BlockSystem {
             transforms,
             pause_state,
             mut score_board,
-            mut level_info
+            mut level_info,
         } = system_data;
 
         if pause_state.paused {

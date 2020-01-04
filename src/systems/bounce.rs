@@ -6,7 +6,7 @@ use crate::util::*;
 use amethyst::{
     core::{math::*, SystemDesc, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, ResourceId, World, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, ResourceId, System, SystemData, World, WriteStorage},
 };
 
 #[derive(SystemData)]
@@ -33,7 +33,7 @@ impl<'s> System<'s> for BounceSystem {
             paddles,
             blocks,
             arena_config,
-            pause_state
+            pause_state,
         } = system_data;
 
         if pause_state.paused {

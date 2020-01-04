@@ -5,7 +5,7 @@ use crate::data::PauseState;
 use amethyst::{
     core::SystemDesc,
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, System, SystemData, ResourceId, World, WriteStorage},
+    ecs::prelude::{Join, Read, ResourceId, System, SystemData, World, WriteStorage},
     renderer::SpriteRender,
 };
 
@@ -29,7 +29,7 @@ impl<'s> System<'s> for BlockStateSystem {
             mut blocks,
             mut renderers,
             pause_state,
-            block_config
+            block_config,
         } = system_data;
 
         if pause_state.paused {

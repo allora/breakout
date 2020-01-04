@@ -1,4 +1,3 @@
-
 use crate::components::Paddle;
 use crate::config::ArenaConfig;
 use crate::data::PauseState;
@@ -6,7 +5,7 @@ use crate::data::PauseState;
 use amethyst::{
     core::{SystemDesc, Time, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, ResourceId, World, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, ResourceId, System, SystemData, World, WriteStorage},
     input::{InputHandler, StringBindings},
 };
 
@@ -32,9 +31,10 @@ impl<'s> System<'s> for PaddleSystem {
         let PaddleSystemData {
             paddles,
             mut transforms,
-            time, input,
+            time,
+            input,
             arena_config,
-            pause_state
+            pause_state,
         } = system_data;
 
         if pause_state.paused {
