@@ -6,29 +6,39 @@ use amethyst::{
     core::{SystemDesc, Transform},
     derive::SystemDesc,
     ecs::prelude::{
-        Entities, Join, Read, ReadStorage, System, SystemData, World, Write, WriteStorage,
+        Entities, Join, Read, ReadStorage, System, SystemData, ResourceId, World, Write, WriteStorage,
     },
 };
+
+#[derive(SystemData)]
+pub struct BlockSystemData<'s> {
+    pub entities: Entities<'s>,
+    pub blocks: WriteStorage<'s, Block>,
+    pub balls: ReadStorage<'s, Ball>,
+    pub transforms: ReadStorage<'s, Transform>,
+    pub pause_state: Read<'s, PauseState>,
+    pub score_board: Write<'s, ScoreBoard>,
+    pub level_info: Write<'s, LevelInfo>,   
+}
 
 /// This system is responsible for tracking block health
 #[derive(SystemDesc)]
 pub struct BlockSystem;
 
 impl<'s> System<'s> for BlockSystem {
-    type SystemData = (
-        Entities<'s>,
-        WriteStorage<'s, Block>,
-        ReadStorage<'s, Ball>,
-        ReadStorage<'s, Transform>,
-        Read<'s, PauseState>,
-        Write<'s, ScoreBoard>,
-        Write<'s, LevelInfo>,
-    );
+    type SystemData = BlockSystemData<'s>;
 
-    fn run(
-        &mut self,
-        (entities, mut blocks, balls, transforms, pause_state, mut score_board, mut level_info): Self::SystemData,
-    ) {
+    fn run(&mut self, system_data: Self::SystemData) {
+        let BlockSystemData {
+            entities,
+            mut blocks,
+            balls,
+            transforms,
+            pause_state,
+            mut score_board,
+            mut level_info
+        } = system_data;
+
         if pause_state.paused {
             return;
         }

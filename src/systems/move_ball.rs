@@ -4,29 +4,39 @@ use crate::data::{LevelInfo, PauseState};
 use amethyst::{
     core::{SystemDesc, Time, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, Write, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, ResourceId, World, Write, WriteStorage},
     input::{InputHandler, StringBindings},
 };
+
+#[derive(SystemData)]
+pub struct MoveBallSystemData<'s> {
+    pub balls: WriteStorage<'s, Ball>,
+    pub transforms: WriteStorage<'s, Transform>,
+    pub paddles: ReadStorage<'s, Paddle>,
+    pub input: Read<'s, InputHandler<StringBindings>>,
+    pub time: Read<'s, Time>,
+    pub pause_state: Read<'s, PauseState>,
+    pub level_info: Write<'s, LevelInfo>,
+}
 
 /// This system is responsible for moving all the balls
 #[derive(SystemDesc)]
 pub struct MoveBallSystem;
 
 impl<'s> System<'s> for MoveBallSystem {
-    type SystemData = (
-        WriteStorage<'s, Ball>,
-        WriteStorage<'s, Transform>,
-        ReadStorage<'s, Paddle>,
-        Read<'s, InputHandler<StringBindings>>,
-        Read<'s, Time>,
-        Read<'s, PauseState>,
-        Write<'s, LevelInfo>,
-    );
+    type SystemData = MoveBallSystemData<'s>;
 
-    fn run(
-        &mut self,
-        (mut balls, mut transforms, paddles, input, time, pause_state, mut level_info): Self::SystemData,
-    ) {
+    fn run(&mut self, system_data: Self::SystemData) {
+        let MoveBallSystemData {
+            mut balls,
+            mut transforms,
+            paddles,
+            input,
+            time,
+            pause_state,
+            mut level_info,
+        } = system_data;
+
         if pause_state.paused {
             return;
         }

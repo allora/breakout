@@ -6,27 +6,36 @@ use crate::util::*;
 use amethyst::{
     core::{math::*, SystemDesc, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, ResourceId, World, WriteStorage},
 };
+
+#[derive(SystemData)]
+pub struct BounceSystemData<'s> {
+    pub balls: WriteStorage<'s, Ball>,
+    pub transforms: ReadStorage<'s, Transform>,
+    pub paddles: ReadStorage<'s, Paddle>,
+    pub blocks: ReadStorage<'s, Block>,
+    pub arena_config: Read<'s, ArenaConfig>,
+    pub pause_state: Read<'s, PauseState>,
+}
 
 /// This system is responsible for properly bouncing the ball off various surfaces
 #[derive(SystemDesc)]
 pub struct BounceSystem;
 
 impl<'s> System<'s> for BounceSystem {
-    type SystemData = (
-        WriteStorage<'s, Ball>,
-        ReadStorage<'s, Transform>,
-        ReadStorage<'s, Paddle>,
-        ReadStorage<'s, Block>,
-        Read<'s, ArenaConfig>,
-        Read<'s, PauseState>,
-    );
+    type SystemData = BounceSystemData<'s>;
 
-    fn run(
-        &mut self,
-        (mut balls, transforms, paddles, blocks, arena_config, pause_state): Self::SystemData,
-    ) {
+    fn run(&mut self, system_data: Self::SystemData) {
+        let BounceSystemData {
+            mut balls,
+            transforms,
+            paddles,
+            blocks,
+            arena_config,
+            pause_state
+        } = system_data;
+
         if pause_state.paused {
             return;
         }

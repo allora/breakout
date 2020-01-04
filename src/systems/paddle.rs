@@ -1,3 +1,4 @@
+
 use crate::components::Paddle;
 use crate::config::ArenaConfig;
 use crate::data::PauseState;
@@ -5,9 +6,19 @@ use crate::data::PauseState;
 use amethyst::{
     core::{SystemDesc, Time, Transform},
     derive::SystemDesc,
-    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage},
+    ecs::prelude::{Join, Read, ReadStorage, System, SystemData, ResourceId, World, WriteStorage},
     input::{InputHandler, StringBindings},
 };
+
+#[derive(SystemData)]
+pub struct PaddleSystemData<'s> {
+    pub paddles: ReadStorage<'s, Paddle>,
+    pub transforms: WriteStorage<'s, Transform>,
+    pub time: Read<'s, Time>,
+    pub input: Read<'s, InputHandler<StringBindings>>,
+    pub arena_config: Read<'s, ArenaConfig>,
+    pub pause_state: Read<'s, PauseState>,
+}
 
 /// This system is responsible for moving all the paddles according to the user
 /// provided input.
@@ -15,19 +26,17 @@ use amethyst::{
 pub struct PaddleSystem;
 
 impl<'s> System<'s> for PaddleSystem {
-    type SystemData = (
-        ReadStorage<'s, Paddle>,
-        WriteStorage<'s, Transform>,
-        Read<'s, Time>,
-        Read<'s, InputHandler<StringBindings>>,
-        Read<'s, ArenaConfig>,
-        Read<'s, PauseState>,
-    );
+    type SystemData = PaddleSystemData<'s>;
 
-    fn run(
-        &mut self,
-        (paddles, mut transforms, time, input, arena_config, pause_state): Self::SystemData,
-    ) {
+    fn run(&mut self, system_data: Self::SystemData) {
+        let PaddleSystemData {
+            paddles,
+            mut transforms,
+            time, input,
+            arena_config,
+            pause_state
+        } = system_data;
+
         if pause_state.paused {
             return;
         }
