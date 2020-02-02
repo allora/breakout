@@ -1,9 +1,7 @@
-use std::iter;
-
 use float_cmp::*;
 
 use amethyst::{
-    core::{math::*, transform::ParentHierarchy},
+    core::{math::*},
     ecs::{
         error::WrongGeneration,
         prelude::{Entity, World, WorldExt},
@@ -14,16 +12,7 @@ use amethyst::{
 /// by the Parent component and maintained by the ParentHierarchy resource
 // from https://github.com/amethyst/evoli src/utils/hierarchy_util.rs
 pub fn delete_hierarchy(root: Entity, world: &mut World) -> Result<(), WrongGeneration> {
-    let entities = {
-        iter::once(root)
-            .chain(
-                world
-                    .read_resource::<ParentHierarchy>()
-                    .all_children_iter(root),
-            )
-            .collect::<Vec<Entity>>()
-    };
-    world.delete_entities(&entities)
+    world.delete_entity(root)
 }
 
 // A point is in a box when its coordinates are smaller or equal than the top

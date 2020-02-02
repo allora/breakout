@@ -2,7 +2,7 @@ use crate::components::{Ball, Paddle};
 use crate::data::{LevelInfo, PauseState};
 
 use amethyst::{
-    core::{SystemDesc, Time, Transform},
+    core::{Time, Transform},
     derive::SystemDesc,
     ecs::prelude::{
         Join, Read, ReadStorage, ResourceId, System, SystemData, World, Write, WriteStorage,

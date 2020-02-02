@@ -3,7 +3,6 @@ use crate::config::BlockConfig;
 use crate::data::PauseState;
 
 use amethyst::{
-    core::SystemDesc,
     derive::SystemDesc,
     ecs::prelude::{Join, Read, ResourceId, System, SystemData, World, WriteStorage},
     renderer::SpriteRender,

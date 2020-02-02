@@ -4,7 +4,7 @@ use crate::data::PauseState;
 use crate::util::*;
 
 use amethyst::{
-    core::{math::*, SystemDesc, Transform},
+    core::{math::*, Transform},
     derive::SystemDesc,
     ecs::prelude::{Join, Read, ReadStorage, ResourceId, System, SystemData, World, WriteStorage},
 };

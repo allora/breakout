@@ -3,7 +3,7 @@ use crate::config::ArenaConfig;
 use crate::data::PauseState;
 
 use amethyst::{
-    core::{SystemDesc, Time, Transform},
+    core::{Time, Transform},
     derive::SystemDesc,
     ecs::prelude::{Join, Read, ReadStorage, ResourceId, System, SystemData, World, WriteStorage},
     input::{InputHandler, StringBindings},
