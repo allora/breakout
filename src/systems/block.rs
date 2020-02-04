@@ -3,7 +3,7 @@ use crate::data::{LevelInfo, PauseState, ScoreBoard};
 use crate::util::point_in_rect;
 
 use amethyst::{
-    core::{Transform},
+    core::Transform,
     derive::SystemDesc,
     ecs::prelude::{
         Entities, Join, Read, ReadStorage, ResourceId, System, SystemData, World, Write,

@@ -86,9 +86,7 @@ impl SimpleState for Breakout {
         // only search for buttons if they have not been found yet
         let StateData { world, .. } = state_data;
 
-        if self.lives_text.is_none()
-        || self.score_text.is_none()
-        {
+        if self.lives_text.is_none() || self.score_text.is_none() {
             world.exec(|ui_finder: UiFinder<'_>| {
                 self.lives_text = ui_finder.find(TEXT_LIVES);
                 self.score_text = ui_finder.find(TEXT_SCORE);
@@ -178,7 +176,7 @@ impl SimpleState for Breakout {
         // Delete UI
         // after destroying the current UI, invalidate references as well (makes things cleaner)
         if let Some(entity) = self.ui_root {
-            delete_hierarchy(entity, data.world).expect("Failed to remove MainMenu");
+            delete_hierarchy(entity, data.world).expect("Failed to remove HUD");
         }
         self.ui_root = None;
         self.score_text = None;

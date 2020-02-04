@@ -1,7 +1,7 @@
 use float_cmp::*;
 
 use amethyst::{
-    core::{math::*},
+    core::math::*,
     ecs::{
         error::WrongGeneration,
         prelude::{Entity, World, WorldExt},
