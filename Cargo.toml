@@ -14,5 +14,6 @@ vulkan = ["amethyst/vulkan"]
 metal = ["amethyst/metal"]
 
 [dependencies.amethyst]
-version = "0.14.0"
+git = "https://github.com/amethyst/amethyst.git"
+branch = "master"
 features = ["no-slow-safety-checks"]
